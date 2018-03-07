@@ -23,7 +23,7 @@ Basic documentation of the description file format can be found **[here](http://
 
 # BlackBox parts relationship scheme
 
-![description scheme](http://www.unirail.org/wp-content/uploads/2017/12/Schem2.png)
+![OverallScheme](http://www.unirail.org/wp-content/uploads/2017/12/OverallScheme.png)
 
 # How to get generated source code
 
