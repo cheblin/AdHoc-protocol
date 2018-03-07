@@ -18,7 +18,7 @@ Using BlackBox, you can easily establish communication not only between microcon
 
 
 # BlackBox description file
-Basic documentation of the description file format can be found **[here](http://www.unirail.org).** Let's take a look how [**LedBlinkProject** demo description file](https://github.com/cheblin/BlackBox_LEDBlink_Demo/blob/master/org/unirail/demo/LedBlinkProject.java) looks like
+Basic documentation of the description file format can be found **[here](http://www.unirail.org).** Let's take a look how [**LedBlinkProject** demo description file](https://github.com/cheblin/BlackBox_LEDBlink_Demo) looks like
 ![descriptionscheme](http://www.unirail.org/wp-content/uploads/2017/12/Capture2.png)
 
 # BlackBox parts relationship scheme
