@@ -33,5 +33,6 @@ Basic documentation of the description file format can be found **[here](http://
 3. Compose your protocol description file (it should be in UTF8 encoding). **[Rules.](http://www.unirail.org/)**
 4. Ensure that description file can me compiled without any errors.
 5. Attach you description file to the email and send it to the address **OneBlackBoxPlease@outlook.com**
-6. In a short time getting zipped archive of your generated, fully tested source code in reply. In addition it will contain Demo and Test file - examples of using generated API and one of the passsed test, respectively.
+6. In a short time getting zipped archive of your generated, fully tested source code in reply.<br>
+In addition it will contain **Demo and Test** file - examples of using generated API and one of the passsed test, respectively.
 7. For comfortable work with generated java code, please install **SlimEnum plugin** from Intellij plugin repository.
