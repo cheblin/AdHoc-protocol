@@ -35,4 +35,4 @@ Basic documentation of the description file format can be found **[here](http://
 5. Attach you description file to the email and send it to the address **OneBlackBoxPlease@outlook.com**
 6. In a short time getting zipped archive of your generated, fully tested source code in reply.<br>
 In addition it will contain **Demo and Test** file - examples of using generated API and one of the passsed test, respectively.
-7. For comfortable work with generated java code, please install **SlimEnum plugin** from Intellij plugin repository.
+7. For comfortable work with generated java code, please install **[SlimEnum plugin](https://plugins.jetbrains.com/plugin/10316-slimenum)** from Intellij plugin repository.
