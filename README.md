@@ -30,7 +30,7 @@ Basic documentation of the description file format can be found **[here](http://
 1. Install **Intellij** [IDEA](https://www.jetbrains.com/idea/download/#section=windows) or, if you are planning to deploy your code on Android devices, [Android Studio.](https://developer.android.com/studio/index.html)
 2. Download [BlackBox metadata annotations](https://github.com/cheblin/BlackBox/tree/master/org/unirail/BlackBox)
 3. Create a new java Project in your IDE and make reference to downloaded metadata annotations. (On **Android Studio** you have to [add JAVA Library module](https://developer.android.com/studio/projects/android-library.html) or edit  [build.gradle](https://github.com/cheblin/BlackBox_LEDBlink_Demo/blob/master/Examples/Android/app/build.gradle) file. Find/add **java.srcDirs** option.)
-3. Compose your protocol description file (it should be in UTF8 encoding).
+3. Compose your protocol description file (it should be in UTF8 encoding). **[Rules.](http://www.unirail.org/)**
 4. Ensure that description file can me compiled without any errors.
 5. Attach you description file to the email and send it to the address **OneBlackBoxPlease@outlook.com**
 6. In a short time getting zipped archive of your generated, fully tested source code in reply. In addition it will contain Demo and Test file - examples of using generated API and one of the passsed test, respectively.
