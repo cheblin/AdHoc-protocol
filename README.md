@@ -1,9 +1,13 @@
-**BlackBox** is a low level binary protocol boilerplate multilanguage **( JAVA, C, C#...SWIFT(upcoming))** code generator. According to your description, BlackBox generate source code, so you just need to insert your received packs handlers, and logic of creating a new package, populating, with data and sending it to the receiver. 
+**BlackBox** is a low level binary protocol boilerplate multilanguage **( C, C++, Rust, C#, Kotlin, Typescript...Scala(upcoming))** code generator. According to your description, BlackBox generate source code, so you just need to insert your received packs handlers, and logic of creating a new package, populating, with data and sending it to the receiver. 
 **BlackBox** supports 
-- bitfields, 
-- any primitive datatypes, 
-- single/double bytes char strings
-- any variations of it's multidimensional arrays with static and variable dimensions. 
+- bitfields,
+- standart set primitive datatypes, 
+- UTF8 strings
+- variations of it's multidimensional arrays with predefined and variable dimensions.
+- nested packages,
+- enums/flag enums 
+- pack constats 
+- pack fields inheritance 
 
 Protocol encapsulate CRC16, [byte stuffing framing](https://web.cs.wpi.edu/~rek/Undergrad_Nets/B07/BitByteStuff.pdf), [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding) compression. <br>
 At the moment, the code generator BlackBox is built like **SaaS**. To get the generated and tested code it is necessary:
