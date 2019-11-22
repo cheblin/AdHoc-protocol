@@ -3,13 +3,15 @@
 - bitfields,
 - standart set primitive datatypes, 
 - UTF8 strings everywhere
-- variations of it's multidimensional arrays with predefined and variable dimensions.
-- nested packages,
-- enums/flag enums 
-- pack constats 
+- variations of its multidimensional fields with predefined and variable dimensions
+- nested packs,
+- ordinary and flagbits like enums 
+- pack binded constats
 - pack fields inheritance 
 
-Protocol encapsulate CRC16, [byte stuffing framing](https://web.cs.wpi.edu/~rek/Undergrad_Nets/B07/BitByteStuff.pdf), [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding) compression. <br>
+To transmit data via the radio channel / Bluetooth / UART, [byte stuffing framing](https://web.cs.wpi.edu/~rek/Undergrad_Nets/B07/BitByteStuff.pdf) and CRC are built into the advanced protocol version. 
+In the case of sending over secure transport or if BlackBox used as a serialization tool of the program data in a file, the standard protocol can be used.Booth version heavy use [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding) compression. <br>
+
 At the moment, the code generator BlackBox is built like **SaaS**. To get the generated and tested code it is necessary:
 
 - Create a protocol specification. In fact, this is a plain java file. [Here is an example](https://github.com/cheblin/BlackBox_LEDBlink_Demo/blob/master/org/unirail/demo/LedBlinkProject.java) of how it looks for a demo project to [control from Android](https://github.com/cheblin/BlackBox_LEDBlink_Demo/tree/master/Examples/Android) a blinking LED on [the board under STM8S103F3P6](https://github.com/cheblin/BlackBox_LEDBlink_Demo/tree/master/Examples/STM8) via Bluetooth UART on HC 08.
