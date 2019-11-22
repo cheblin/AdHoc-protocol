@@ -2,7 +2,7 @@
 **BlackBox** supports 
 - bitfields,
 - standart set primitive datatypes, 
-- UTF8 strings
+- UTF8 strings everywhere
 - variations of it's multidimensional arrays with predefined and variable dimensions.
 - nested packages,
 - enums/flag enums 
