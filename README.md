@@ -9,8 +9,8 @@
 - pack binded constats
 - pack fields inheritance 
 
-To transmit data via the radio channel / Bluetooth / UART, [byte stuffing framing](https://web.cs.wpi.edu/~rek/Undergrad_Nets/B07/BitByteStuff.pdf) and CRC are built into the advanced protocol version. 
-In the case of sending over secure transport or if BlackBox used as a serialization tool of the program data in a file, the standard protocol can be used.Booth version heavy use [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding) compression. <br>
+To transmit data via the radio channel / Bluetooth / UART, [byte stuffing framing](https://web.cs.wpi.edu/~rek/Undergrad_Nets/B07/BitByteStuff.pdf) and CRC are built into the AdvChannel entity. 
+In the case of sending over secure transport or if BlackBox used as a serialization tool of the program data in a file, the StdChannel is using. Booth channel version heavy use [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding) compression. <br>
 
 At the moment, the code generator BlackBox is built like **SaaS**. To get the generated and tested code it is necessary:
 
