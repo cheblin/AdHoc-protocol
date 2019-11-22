@@ -6,6 +6,6 @@ import java.lang.annotation.Target;
 // Required field that value has up direction values dispersion gradient.
 @Target(ElementType.FIELD)
 public @interface A {
-	double value() default 0;//most often lowest value or value range (-7 | 78)
+	double value() default 0;//most often lowest possible value or value range (-7 | 78)
 }
 	

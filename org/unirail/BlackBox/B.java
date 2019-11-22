@@ -6,6 +6,6 @@ import java.lang.annotation.Target;
 //Required bit field.
 @Target(ElementType.FIELD)
 public @interface B {
-	long value();//how many bits it used or values range (3|82)
+	long value();//How many bits field used to store its value or field values range (3|82) Bits amount will be count.
 }
 	

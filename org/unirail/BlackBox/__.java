@@ -3,9 +3,9 @@ package org.unirail.BlackBox;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
-//Optional multidimensional field. Dimensions are described in the form (3|3|4)
+//Field with array items
 @Target(ElementType.FIELD)
-public @interface D_ {
-	long value();
+public @interface __ {
+	long value();//item array length
 }
 	

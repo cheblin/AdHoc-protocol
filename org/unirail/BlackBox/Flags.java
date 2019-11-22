@@ -3,8 +3,6 @@ package org.unirail.BlackBox;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
-//Pack unique identification. Applied by the code generator.
+//Make enum as a bitflags set instead of simple constants set
 @Target(ElementType.TYPE)
-public @interface id {
-	long value();
-}
+public @interface Flags {}
