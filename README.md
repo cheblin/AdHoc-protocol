@@ -1,4 +1,4 @@
-**BlackBox** is a multilingual **C, C++, Rust, C#, Kotlin, Typescript...Scala(upcoming)**, low-level binary protocol boilerplate code generator. According to your description, BlackBox generate source code, so you just need to insert your received packs handlers, and logic of creating a new package, populating, with data and sending it to the receiver. 
+**BlackBox** is a multilingual **C, C++, Rust, C#, Kotlin, Typescript...Scala(upcoming)**, low-level binary protocol boilerplate code generator. According to your description, BlackBox generates source code, so you just need to insert your received packs handlers, and logic of creating a new package, populating, with data and sending it to the receiver. 
 **BlackBox** supports 
 - bitfields,
 - standart set primitive datatypes, 
