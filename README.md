@@ -56,7 +56,22 @@ and import them in description file with **import org.unirail.AdHoc.\*;**.
 
 This annotation provides additional meta-information for the code generator.
 
-# Numeric fields value changing dispersion 
+# Field return array item
+
+If needed pack field can store and return array item, this can be accomplished with  array item `@__` annotation.
+
+### Using example
+
+```java 
+    @__(100) int array_field;
+``` 
+
+
+# String fields
+
+Strings in AdHoc protocol in all languages are encoded in UTF-8. By default, without annotation, a string can allocate at most 256 bytes. This length can be changed with array item `@__` annotation 
+
+# Numeric fields value changing dispersion description
 
 The pack numeric fields annotations \@A, \@V, \@X, \@I are denoting the
 meta-information about the pattern of the field value changing. Based on this
@@ -108,7 +123,7 @@ The most probable value  – **val** is passed as  annotation argument
 
  
 
-# Multidimensional fields
+# Multidimensional fields  description
 
 The following annotations are used to describe multidimensional fields
 
@@ -117,6 +132,7 @@ The following annotations are used to describe multidimensional fields
 | `@D`  | All space for field data is allocated in advance as field initialized.  Used in a case when it is known that the array is most likely to be completely filled with data. Even if the data is not set – the  space for it is allocated, but there is no resource wasted on tracking the fullness of the data. |
 | `@D_` | Space for data is allocated only when actually data inserted. Used for **sparse** arrays, when it is known that the array is most likely to be poorly filled.  There are additional costs associated with tracking the fullness of the data.     | 
 
+### Using example
 | ........................Example.....................| **Description**                                                                                                                                                                                                                                |
 |:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | @D(1 \| 2\| 3) int field1;      | Mandatory multidimensional array with predefined dimensions  **1 x 2 x 3.**   Returns primitives.                                                                                                                                                                         |
@@ -127,11 +143,11 @@ The following annotations are used to describe multidimensional fields
 | @A\_ \@D( 1 \| 2 \| 3 ) byte field; | **Optional** field is a multidimensional array with predefined dimensions of **1 x 2 x 3.**  When an array is created, all the necessary space is allocated.  Returns primitives with unequal distribution of values upward.                                                             |
 | @A(337) String field;               | Returns a string with a maximum length of 337 **2-bytes per** **characters**. (An annotation  \@V  denote a string **1-byte** characters string)                                                                                                                  |
 | @V String [] field;                 | Returns the contents of the string – an array of** single-byte** characters. The maximum length of lines is up to 127 characters.                                                                                                              |
-| @X_(3 / 45) @D( 12) byte [] field; | **Optional** field returns an array of a predefined length  **12.** The values of the array are in a given range, with uneven distribution in both directions relative to the middle of the range.                                             |
+| @X_(3 / 45) @__( 12) byte field; | **Optional** field returns an array items of a predefined length  **12.** The values of the array are in a given range, with uneven distribution in both directions relative to the middle of the range.                                             |
 | @D(-45) int [] field;               | **Optional** field.  Returns an array of lengths from **1** to **45**                                                                                                                                                                                               |
 | @B( 3 ) byte field;                 | Mandatory bit field. Field length 3 bits                                                                                                                                                                                                       |
-| @B_( 12 \| 67 ) byte field;         | **Optional** bit field. The length of the field in bits will be calculated based on the transmitted range of allowed values.                                                                                                                   |
-| @D_(1 \| -2 \| -3)  int  field1;   | A multidimensional array with a predetermined first dimension **1 **while other dimensions are variable. The place for the data, within the maximum values of the dimensions, is allocated only as it is added to the array.   Return primitives.                 |
+| @B_( 12 \| 67 ) byte field;         | **Optional** bit field. The length of the field in bits will be calculated based on the provides values range.                                                                                                                   |
+| @D_(1 \| -2 \| -3)  int  field1;   | A multidimensional array with a predetermined first dimension **1 **while other dimensions are variable. The place for the data, within the maximum values of the dimensions, is allocated only as it is added to the array.   Return primitive int.                 |
 
 
 
