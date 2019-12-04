@@ -61,13 +61,14 @@ This annotation provides additional meta-information for the code generator.
 Any field in **AdHoc** protocol can be `required` or `optional`. 
 Without the special annotation, all fields with primitive datatype are `required`   
 `required` field allocates space in the transmitted packet even if it was not filled with data.  
-in its turn empty `optional` field allocates in packet just a few bits. Fields with String and nested packet datatype are optional.
-Any field with primitive or array-item datatype can be made `optional` with a special form of annotation that ends with _ (underscore) `@A_, @V_, @X_, @I_`
+in its turn empty `optional` field allocates in packet just a few bits.  
+ Fields with String and nested packet datatype are optional.
+Any field with primitive or array-item datatype can be made `optional` with a special form of annotation that ends with _ (underscore) `@A_, @V_, @X_, @I_`  
 Before read data from the `optional` field, we need to ensure that it contains any data. 
 
 # Fields that contain array-item
 
-If needed that pack field can store and return array-item, this can be denoted with  array-item `@__( size )` annotation.
+Packet field can store and return array-item, this can be denoted with  array-item `@__( size )` annotation.
 
 ### Using example
 
@@ -85,7 +86,8 @@ The exact array length is determined at field initialization.
 
 # String fields
 
-Strings in AdHoc protocol in all languages are encoded in UTF-8. By default, without annotation, a string can allocate at most 256 bytes. This default length can be changed with array-item `@__( size )` annotation.
+Strings in AdHoc protocol on all languages are encoded in UTF-8 byte array. By default, without annotation, a string can allocate at most 256 bytes. 
+This default length can be changed with array-item `@__( size )` annotation.
 All string fields are optional, it means it can be NULL ( does not contain any value).
 
 ### Using example
@@ -99,20 +101,21 @@ String  at_most_256_bytes_string; // field hold string with default, at most 265
 
 # Numeric fields value changing dispersion description
 
-The pack numeric fields annotations \@A, \@V, \@X, \@I are denoting the
+The packet numeric fields can be annotated with `@A, @V, @X, @I` This annotations are denoting the
 meta-information about the pattern of the field value changing. Based on this
-annotation information code generator can ignore or apply [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding)  compression
-algorithm, which allows well and with minimal load, reduces the sending data
+information, code generator can skip or apply [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding)  compression
+algorithm, which allows well and with minimal resource load, reduces the sending data
 amount. This is achieved by excluding from transmission of the higher, not
-filled bytes but restoring them on the receiving side.
+filled bytes, and then restoring them on the receiving side.
 
 This graph shows the dependence of sending bytes on transferred value
 
 ![image](https://user-images.githubusercontent.com/29354319/70126207-84ba9980-16b3-11ea-9900-48251b545eef.png)
 
-It is became clear that with Base 128 Varint encoding, smaller value require less bytes to transfer.
-As protocol creator, you know your data, and annotations are the means by which you pass your knowledge to the code generator.
-For example, numeric data can have random values, uniformly distributed in full range. Almost as noise.
+It is became clear that with `Base 128 Varint encoding`, smaller value require less bytes to transfer.
+As protocol creator, you know your dat better then any code generator, and annotations are the means by which you pass your knowledge to the generator.
+
+For example, if numeric data have random values, uniformly distributed in full range. Almost as noise.
 
 ![image](https://user-images.githubusercontent.com/29354319/70127303-bdf40900-16b5-11ea-94c9-c0dcd045500f.png)
 
@@ -120,9 +123,11 @@ The compression or encoding of this type of data is wasting computation resource
 
 This kind numeric fields should not have any value dispersion annotation or have `@I` if needed.
 
-Other numeric fields type can have some dispersion/gradient pattern in its value changing
+Otherwise if numeric fields have some dispersion/gradient pattern in its value changing...
 
 ![image](https://user-images.githubusercontent.com/29354319/70128574-0a404880-16b8-11ea-8a4d-efa8a7358dc1.png)
+
+It is possible to leverage this knowledge to minimize the amount of data transmission.
 
 Three main types of distribution of numeric field value changing can be highlighted
 
@@ -133,19 +138,19 @@ Three main types of distribution of numeric field value changing can be highligh
 ![image](https://user-images.githubusercontent.com/29354319/70131118-bbe17880-16bc-11ea-84a2-2a2a4106a810.png)|Fluctuations are possible only in the direction of smaller values relative to most probable value `val`.These numeric field is annotated with  `@V`
 
 
-The most probable value  – **val** is passed as  annotation argument 
+The most probable value  – **val** is passed to code generator as  annotation argument.
 
 
 ### Using example
-| **Language construct**    | **Description**                                                                                                                                                     |
-|:--------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| @I byte field             | mandatory field, the field data before sending is not encoded (poorly compressible), and can take values in the range from **-128** to **127**                      |
-| @A byte field            | mandatory field, the data is compressed, the field can take values in the range from **0** to **255**. In fact it is an analogy to the type **uint8_t** in **C.** |
-| @I (-1000) byte field    | mandatory field, (not to be compressed), the field can take values in the range from **-1128** to **-873**                                                          |
-| @X_ short field          | The **nullable(optional)** field takes values in the range  from **-32 768** to **32 767**. will be compressed with ZigZag on sending.                                       |
-| @A (1000) short field    | mandatory field takes a value between – **1 000** to **65 535** will be compressed on sending.                                                           |
-| @V_ short field          | **nullable** field takes a value between    **-65 535**  to **0**    will be compressed on sending.                                                                 |
-| @I(-11/75) short field   | Required field with uniformly distributed values in the specified range.                                                                                            |
+```java
+ @I byte field;           //mandatory field, the field data before sending is not encoded (poorly compressible), and can take values in the range from **-128** to **127**                      |
+ @A byte field;           //mandatory field, the data is compressed, the field can take values in the range from **0** to **255**. In fact it is an analogy to the type **uint8_t** in **C.** |
+ @I (-1000) byte field;   //mandatory field, (not to be compressed), the field can take values in the range from **-1128** to **-873**                                                          |
+ @X_ short field;         //The **nullable(optional)** field takes values in the range  from **-32 768** to **32 767**. will be compressed with ZigZag on sending.                                       |
+ @A (1000) short field;   //mandatory field takes a value between – **1 000** to **65 535** will be compressed on sending.                                                           |
+ @V_ short field;         //**nullable** field takes a value between    **-65 535**  to **0**    will be compressed on sending.                                                                 |
+ @I(-11/75) short field;  //Required field with uniformly distributed values in the specified range.                                                                                            |
+```
 
  
 
