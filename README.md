@@ -56,6 +56,7 @@ and import them in description file with **import org.unirail.AdHoc.\*;**.
 
 This annotation provides additional meta-information for the code generator.
 
+
 # Field return array item
 
 If needed pack field can store and return array item, this can be accomplished with  array item `@__` annotation.
@@ -63,7 +64,9 @@ If needed pack field can store and return array item, this can be accomplished w
 ### Using example
 
 ```java 
-    @__(100) int array_field;
+    @__(100) int array_item_size; // field return array item predifined of 100 ints length 
+    @__(-54) float array_item_same; // array field at most 54 floats. The exact array length is determined at field initialization. If this field is multidimensional all items has the same array length  
+    @__(~81) double array_item_vars; //array field at most 81 doubles. The exact array length is individually and depends on the insertion data size, which, again, should be at most 81
 ``` 
 
 
