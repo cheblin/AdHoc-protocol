@@ -56,6 +56,8 @@ and import them in description file with **import org.unirail.AdHoc.\*;**.
 
 This annotation provides additional meta-information for the code generator.
 
+# `Optional` and `required` fields
+
 Any field in **AdHoc** protocol can be `required` or `optional`. 
 Without the special annotation, all fields with primitive datatype are `required`   
 `required` field allocates space in the transmitted packet even if it was not filled with data.  
