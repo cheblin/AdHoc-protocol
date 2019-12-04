@@ -90,9 +90,9 @@ These fields are annotated with  **\@A, \@V, \@X**    denote three variants
 of values distribution relative to the most probable. ** **
 
 
-| Italic             |  Block letters |
+| pattern             |  description 
 :-------------------------:|:-------------------------
-![image](https://user-images.githubusercontent.com/29354319/70130767-14644600-16bc-11ea-898b-c10dcade2d75.png)|Rare fluctuations are possible only in the direction of bigger values relative to most probable value `val`.
+![image](https://user-images.githubusercontent.com/29354319/70131681-afa9eb00-16bd-11ea-9fcc-c6637d80114c.png)|Rare fluctuations are possible only in the direction of bigger values relative to most probable value `val`.
 ![image](https://user-images.githubusercontent.com/29354319/70130976-7d4bbe00-16bc-11ea-946a-cfa533a09efd.png)|Rare fluctuations are possible in both directions relative to most probable value `val`.
 ![image](https://user-images.githubusercontent.com/29354319/70131118-bbe17880-16bc-11ea-84a2-2a2a4106a810.png)|Fluctuations are possible only in the direction of smaller values relative to most probable value `val`.
 
