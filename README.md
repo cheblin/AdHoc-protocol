@@ -56,7 +56,7 @@ and import them in description file with **import org.unirail.AdHoc.\*;**.
 
 This annotation provides additional meta-information for the code generator.
 
-## Numeric fields value changing dispersion 
+# Numeric fields value changing dispersion 
 
 The pack numeric fields annotations \@A, \@V, \@X, \@I are denoting the
 meta-information about the pattern of the field value changing. Based on this
@@ -95,28 +95,59 @@ Three main types of distribution of numeric field value changing can be highligh
 The most probable value  – **val** is passed as  annotation argument 
 
 
-
+### Using example
 | **Language construct**    | **Description**                                                                                                                                                     |
 |:--------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | @I byte field             | mandatory field, the field data before sending is not encoded (poorly compressible), and can take values in the range from **-128** to **127**                      |
 | @A byte field            | mandatory field, the data is compressed, the field can take values in the range from **0** to **255**. In fact it is an analogy to the type **uint8_t** in **C.** |
 | @I (-1000) byte field    | mandatory field, (not to be compressed), the field can take values in the range from **-1128** to **-873**                                                          |
-| @X_ short field          | The **nullable(optional)** field takes values in the range  from **-32 768** to **32 767**. will be compressed on sending.                                       |
-| @A (1000) short field    | **nullable(optional)**  field takes a value between – **65,535**  to **0** will be compressed on sending.                                                           |
-| @V_ short field          | **nullable** field takes a value between    –**65 535**  to **0**    will be compressed on sending.                                                                 |
+| @X_ short field          | The **nullable(optional)** field takes values in the range  from **-32 768** to **32 767**. will be compressed with ZigZag on sending.                                       |
+| @A (1000) short field    | mandatory field takes a value between – **1 000** to **65 535** will be compressed on sending.                                                           |
+| @V_ short field          | **nullable** field takes a value between    **-65 535**  to **0**    will be compressed on sending.                                                                 |
 | @I(-11/75) short field   | Required field with uniformly distributed values in the specified range.                                                                                            |
 
  
 
-## Multidimensional fields
+# Multidimensional fields
 
 The following annotations are used to describe multidimensional fields
 
 |  |  |
 |-----|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| @D  | Multidimensional field, all space for data is allocated in advance as field initialized.  Used in a case when it is known that the array is most likely to be completely filled with data. Even if the data is not set – the  space for it is allocated, but there is no resource wasted on tracking the fullness of the data. |
-| @D_ | Multidimensional field, space for data is allocated only when data inserted. Used for **sparse** arrays, when it is known that the array is most likely to be poorly filled.  There are additional costs associated with tracking the fullness of the data.     | 
+| `@D`  | All space for field data is allocated in advance as field initialized.  Used in a case when it is known that the array is most likely to be completely filled with data. Even if the data is not set – the  space for it is allocated, but there is no resource wasted on tracking the fullness of the data. |
+| `@D_` | Space for data is allocated only when actually data inserted. Used for **sparse** arrays, when it is known that the array is most likely to be poorly filled.  There are additional costs associated with tracking the fullness of the data.     | 
 
+| **Language construct**              | **Description**                                                                                                                                                                                                                                |
+|-------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| \@D(1 \|2\| 3)  int  field1;      | Mandatory multidimensional array with predefined dimensions                                                                                                                                                                                    |
+|                                     | **1 x 2 x 3.**                                                                                                                                                                                                                                 |
+|                                     | Returns primitives.                                                                                                                                                                                                                            |
+| \@D(1 \| 2 \| 3)  int []  field1;   | Multidimensional array with predefined dimensions                                                                                                                                                                                              |
+|                                     | **1 x 2**                                                                                                                                                                                                                                      |
+|                                     | Returns arrays of **predefined **length **3**.                                                                                                                                                                                                 |
+| \@D(1 \| 2 \| -3)  int []  field1;  | A multidimensional array with predefined dimensions                                                                                                                                                                                            |
+|                                     | **1 x 2**                                                                                                                                                                                                                                      |
+|                                     | Returns arrays of **equal**,  variable (  **1** to  **3** ) length                                                                                                                                                                             |
+| \@D(1 \| 2 \| \~3)  int []  field1; | Multidimensional array with predefined dimensions                                                                                                                                                                                              |
+|                                     | **1 x 2**                                                                                                                                                                                                                                      |
+|                                     | Returns arrays of **different,** variable (  **1** to  **3** ) length                                                                                                                                                                          |
+| \@A \@D( 1 \| 2 \| 3 ) byte field   | **Required** field multidimensional array with predefined dimensions                                                                                                                                                                           |
+|                                     | **1 x 2 x 3.**                                                                                                                                                                                                                                 |
+|                                     | Returns primitives with uneven distribution of values upward.                                                                                                                                                                                  |
+| \@A\_ \@D( 1 \| 2 \| 3 ) byte field | **Optional** field is a multidimensional array with predefined dimensions of **1 x 2 x 3.**  When an array is created, all the necessary space is allocated.                                                                                   |
+|                                     | Returns primitives with unequal distribution of values upward.                                                                                                                                                                                 |
+| \@A(337) String field               | Returns a string with a maximum length of 337 **2-bytes per** **characters**.                                                                                                                                                                  |
+|                                     | (An annotation  \@V  denote a string **1-byte** characters string)                                                                                                                                                                             |
+| \@V String [] field                 | Returns the contents of the string – an array of** single-byte** characters. The maximum length of lines is up to 127 characters.                                                                                                              |
+| \@X_(3 / 45) \@D( 12) byte [] field | **Optional** field returns an array of a predefined length  **12.** The values of the array are in a given range, with uneven distribution in both directions relative to the middle of the range.                                             |
+| \@D(-45) int [] field               | **Optional** field.                                                                                                                                                                                                                            |
+|                                     | Returns an array of lengths from **1** to **45**                                                                                                                                                                                               |
+| \@B( 3 ) byte field                 | Mandatory bit field. Field length 3 bits                                                                                                                                                                                                       |
+| \@B_( 12 \| 67 ) byte field         | **Optional** bit field. The length of the field in bits will be calculated based on the transmitted range of allowed values.                                                                                                                   |
+| \@D_(1 \| -2 \| -3)  int  field1;   | A multidimensional array with a predetermined first dimension **1 **while other dimensions are variable. The place for the data, within the maximum values of the dimensions, is allocated only as it is added to the array.                   |
+|                                     | Return primitives.                                                                                                                                                                                                                             |
+
+In addition to optimizing traffic, ** BlackBox  **allows you
 
 
 
