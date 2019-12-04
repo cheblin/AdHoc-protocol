@@ -94,6 +94,27 @@ The most probable value  – **val** is passed as  annotation argument
 
 
 
+| **Language construct**    | **Description**                                                                                                                                                     |
+|:--------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ```@I byte field```            | mandatory field, the field data before sending is not encoded (poorly compressible), and can take values in the range from **-128** to **127**                      |
+| \@A byte field            | mandatory field, the data is compressed, the field can take values in the range from **0** to **255** .  In fact it is an analogy to the type **uint8_t** in **C.** |
+| \@I (-1000) byte field    | mandatory field, (not to be compressed), the field can take values in the range from **-1128** to **-873**                                                          |
+| \@X_ short field          | The** nullable(optional)** field takes values in the range  from **-32 768** to **32 767 . **will be compressed on sending.                                       |
+| \@A (1000) short field    | **nullable(optional)**  field takes a value between – **65,535**  to **0 **will be compressed on sending.                                                           |
+| \@V_ short field          | **nullable** field takes a value between    –**65 535**  to **0**    will be compressed on sending.                                                                 |
+| \@I(-11/75) short field   | Required field with uniformly distributed values in the specified range.                                                                                            |
+
+ 
+
+**Description of fields with arrays**
+
+The following annotations are used to describe arrays
+
+| \@D   | This annotation type denotes the array with predefined dimensions and all space for data is allocated in advance. Used in a case when it is known that the array is most likely to be completely filled with data. Even if the data is not set – the space for it is allocated, but there is no resource wasted on tracking the fullness of the data. |
+|-------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| \@D\_ | This annotation type denotes the array with predefined parameters, but the space for data, have set within predefined limits, is allocated only when data inserted. Used for **sparse** arrays, when it is known that the array is most likely to be poorly filled. There are additional costs associated with tracking the fullness of the data.     |
+
+ 
 
 
 
