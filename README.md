@@ -56,10 +56,16 @@ and import them in description file with **import org.unirail.AdHoc.\*;**.
 
 This annotation provides additional meta-information for the code generator.
 
+Any field in **AdHoc** protocol can be `required` or `optional`. 
+Without the special annotation, all fields with primitive datatype are `required`   
+`required` field allocates space in the transmitted packet even if it was not filled with data.  
+in its turn empty `optional` field allocates in packet just a few bits. Fields with String and nested packet datatype are optional.
+Any field with primitive or array-item datatype can be made `optional` with a special form of annotation that ends with _ (underscore) `@A_, @V_, @X_, @I_`
+Before read data from the `optional` field, we need to ensure that it contains any data. 
 
 # Fields that contain array-item
 
-If needed pack field can store and return array-item, this can be accomplished with  array-item `@__` annotation.
+If needed that pack field can store and return array-item, this can be denoted with  array-item `@__( size )` annotation.
 
 ### Using example
 
@@ -77,7 +83,17 @@ The exact array length is determined at field initialization.
 
 # String fields
 
-Strings in AdHoc protocol in all languages are encoded in UTF-8. By default, without annotation, a string can allocate at most 256 bytes. This length can be changed with array-item `@__` annotation 
+Strings in AdHoc protocol in all languages are encoded in UTF-8. By default, without annotation, a string can allocate at most 256 bytes. This default length can be changed with array-item `@__( size )` annotation.
+All string fields are optional, it means it can be NULL ( does not contain any value).
+
+### Using example
+
+```java 
+String  at_most_256_bytes_string; // field hold string with default, at most 265 bytes length 
+
+@__( 1024 ) String at_most_1024_bytes_string; // field with string that syze at most 1024 bytes length 
+``` 
+ 
 
 # Numeric fields value changing dispersion description
 
