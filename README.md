@@ -96,11 +96,11 @@ The most probable value  – **val** is passed as  annotation argument
 
 | **Language construct**    | **Description**                                                                                                                                                     |
 |:--------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ```@I byte field```            | mandatory field, the field data before sending is not encoded (poorly compressible), and can take values in the range from **-128** to **127**                      |
-| \@A byte field            | mandatory field, the data is compressed, the field can take values in the range from **0** to **255** .  In fact it is an analogy to the type **uint8_t** in **C.** |
+| ```java @I byte field```            | mandatory field, the field data before sending is not encoded (poorly compressible), and can take values in the range from **-128** to **127**                      |
+| \@A byte field            | mandatory field, the data is compressed, the field can take values in the range from **0** to **255**. In fact it is an analogy to the type **uint8_t** in **C.** |
 | \@I (-1000) byte field    | mandatory field, (not to be compressed), the field can take values in the range from **-1128** to **-873**                                                          |
-| \@X_ short field          | The** nullable(optional)** field takes values in the range  from **-32 768** to **32 767 . **will be compressed on sending.                                       |
-| \@A (1000) short field    | **nullable(optional)**  field takes a value between – **65,535**  to **0 **will be compressed on sending.                                                           |
+| \@X_ short field          | The **nullable(optional)** field takes values in the range  from **-32 768** to **32 767**. will be compressed on sending.                                       |
+| \@A (1000) short field    | **nullable(optional)**  field takes a value between – **65,535**  to **0** will be compressed on sending.                                                           |
 | \@V_ short field          | **nullable** field takes a value between    –**65 535**  to **0**    will be compressed on sending.                                                                 |
 | \@I(-11/75) short field   | Required field with uniformly distributed values in the specified range.                                                                                            |
 
