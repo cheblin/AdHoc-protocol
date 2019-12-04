@@ -56,7 +56,7 @@ and import them in description file with **import org.unirail.AdHoc.\*;**.
 
 This annotation provides additional meta-information for the code generator.
 
-#Numeric fields value changing dispersion 
+## Numeric fields value changing dispersion 
 
 The pack numeric fields annotations \@A, \@V, \@X, \@I are denoting the
 meta-information about the pattern of the field value changing. Based on this
@@ -108,7 +108,7 @@ The most probable value  – **val** is passed as  annotation argument
 
  
 
-#Multidimensional fields
+## Multidimensional fields
 
 The following annotations are used to describe multidimensional fields
 
