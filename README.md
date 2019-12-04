@@ -56,6 +56,8 @@ and import them in description file with **import org.unirail.AdHoc.\*;**.
 
 This annotation provides additional meta-information for the code generator.
 
+##Numeric fields value changing dispersion 
+
 The pack numeric fields annotations \@A, \@V, \@X, \@I are denoting the
 meta-information about the pattern of the field value changing. Based on this
 annotation information code generator can ignore or apply [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding)  compression
@@ -106,14 +108,14 @@ The most probable value  – **val** is passed as  annotation argument
 
  
 
-**Description of fields with arrays**
+##Multidimensional fields
 
-The following annotations are used to describe arrays
+The following annotations are used to describe multidimensional fields
 
 |  |  |
 |-----|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| @D  | This annotation type denotes the array with predefined dimensions and all space for data is allocated in advance.  Used in a case when it is known that the array is most likely to be completely filled with data. Even if the data is not set – the  space for it is allocated, but there is no resource wasted on tracking the fullness of the data. |
-| @D_ | This annotation type denotes the array with predefined parameters, but the space for data, have set within predefined limits,  is allocated only when data inserted. Used for **sparse** arrays, when it is known that the array is most likely to be poorly filled.  There are additional costs associated with tracking the fullness of the data.     | 
+| @D  | Multidimensional field, all space for data is allocated in advance as field initialized.  Used in a case when it is known that the array is most likely to be completely filled with data. Even if the data is not set – the  space for it is allocated, but there is no resource wasted on tracking the fullness of the data. |
+| @D_ | Multidimensional field, space for data is allocated only when data inserted. Used for **sparse** arrays, when it is known that the array is most likely to be poorly filled.  There are additional costs associated with tracking the fullness of the data.     | 
 
 
 
