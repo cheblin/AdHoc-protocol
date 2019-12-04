@@ -57,14 +57,14 @@ and import them in description file with **import org.unirail.AdHoc.\*;**.
 This annotation provides additional meta-information for the code generator.
 
 
-# Field return array item
+# Fields that contain array-item
 
-If needed pack field can store and return array item, this can be accomplished with  array item `@__` annotation.
+If needed pack field can store and return array-item, this can be accomplished with  array-item `@__` annotation.
 
 ### Using example
 
 ```java 
-    @__(100) int array_item_size; // field return array item predifined of 100 ints length 
+    @__(100) int array_item_size; // field return array-item predifined of 100 ints length 
     @__(-54) float array_item_same; // array field at most 54 floats. The exact array length is determined at field initialization. If this field is multidimensional all items has the same array length  
     @__(~81) double array_item_vars; //array field at most 81 doubles. The exact array length is individually and depends on the insertion data size, which, again, should be at most 81
 ``` 
@@ -72,7 +72,7 @@ If needed pack field can store and return array item, this can be accomplished w
 
 # String fields
 
-Strings in AdHoc protocol in all languages are encoded in UTF-8. By default, without annotation, a string can allocate at most 256 bytes. This length can be changed with array item `@__` annotation 
+Strings in AdHoc protocol in all languages are encoded in UTF-8. By default, without annotation, a string can allocate at most 256 bytes. This length can be changed with array-item `@__` annotation 
 
 # Numeric fields value changing dispersion description
 
@@ -139,14 +139,14 @@ The following annotations are used to describe multidimensional fields
 | ........................Example.....................| **Description**                                                                                                                                                                                                                                |
 |:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | @D(1 \| 2\| 3) int field1;      | Mandatory multidimensional array with predefined dimensions  **1 x 2 x 3.**   Returns primitives.                                                                                                                                                                         |
-| @D(1 \| 2\) @__(3) int field1;   | Multidimensional field with predefined dimensions **1 x 2**  Returns  array items of **predefined **length **3**.                                                                                                                                    |
-| @D(1 \| 2 ) @__(-3) int field1;  | A multidimensional field with predefined dimensions **1 x 2**   Returns array items with all same up to **3** length                                                                                                                   |
-| @D(1\|2\)  @__(~3) int field1; | Multidimensional array with predefined dimensions **1 x 2**   Returns array items with individual variable up to **3** length                                                                                                           |
+| @D(1 \| 2\) @__(3) int field1;   | Multidimensional field with predefined dimensions **1 x 2**  Returns  array-items of **predefined **length **3**.                                                                                                                                    |
+| @D(1 \| 2 ) @__(-3) int field1;  | A multidimensional field with predefined dimensions **1 x 2**   Returns array-items with all same up to **3** length                                                                                                                   |
+| @D(1\|2\)  @__(~3) int field1; | Multidimensional array with predefined dimensions **1 x 2**   Returns array-items with individual variable up to **3** length                                                                                                           |
 | @A \@D( 1 \| 2 \| 3 ) byte field;   | **Required** field multidimensional array with predefined dimensions **1 x 2 x 3.**  Returns primitives with uneven distribution of values upward.                                                                                                     |
 | @A\_ \@D( 1 \| 2 \| 3 ) byte field; | **Optional** field is a multidimensional array with predefined dimensions of **1 x 2 x 3.**  When an array is created, all the necessary space is allocated.  Returns primitives with unequal distribution of values upward.                                                             |
 | @A(337) String field;               | Returns a string with a maximum length of 337 **2-bytes per** **characters**. (An annotation  \@V  denote a string **1-byte** characters string)                                                                                                                  |
 | @V String [] field;                 | Returns the contents of the string – an array of** single-byte** characters. The maximum length of lines is up to 127 characters.                                                                                                              |
-| @X_(3 / 45) @__( 12) byte field; | **Optional** field returns an array items of a predefined length  **12.** The values of the array are in a given range, with uneven distribution in both directions relative to the middle of the range.                                             |
+| @X_(3 / 45) @__( 12) byte field; | **Optional** field returns an array-items of a predefined length  **12.** The values of the array are in a given range, with uneven distribution in both directions relative to the middle of the range.                                             |
 | @D(-45) int [] field;               | **Optional** field.  Returns an array of lengths from **1** to **45**                                                                                                                                                                                               |
 | @B( 3 ) byte field;                 | Mandatory bit field. Field length 3 bits                                                                                                                                                                                                       |
 | @B_( 12 \| 67 ) byte field;         | **Optional** bit field. The length of the field in bits will be calculated based on the provides values range.                                                                                                                   |
