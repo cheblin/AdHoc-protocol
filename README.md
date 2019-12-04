@@ -110,8 +110,9 @@ The most probable value  – **val** is passed as  annotation argument
 
 The following annotations are used to describe arrays
 
+|  |  |
+|-----|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | @D  | This annotation type denotes the array with predefined dimensions and all space for data is allocated in advance.  Used in a case when it is known that the array is most likely to be completely filled with data. Even if the data is not set – the  space for it is allocated, but there is no resource wasted on tracking the fullness of the data. |
-|-----|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | @D_ | This annotation type denotes the array with predefined parameters, but the space for data, have set within predefined limits,  is allocated only when data inserted. Used for **sparse** arrays, when it is known that the array is most likely to be poorly filled.  There are additional costs associated with tracking the fullness of the data.     | 
 
 
