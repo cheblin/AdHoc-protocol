@@ -52,9 +52,9 @@ Create java file in your company `namespace` and import annotations with **impor
 
 In the java file, only one top-level class can be `public` and it name should be the same as file name. In AdHoc protocol this class name is the protocol project name, and the body not used should be empty.
 ```java
-package org.company.some_namespace;
+package org.company.some_namespace;// You project namespace. required!
 
-import org.unirail.AdHoc.*;
+import org.unirail.AdHoc.*;//        importing AdHoc protocol annotations 
 
 public class MyDemoProject {} //AdHoc protocol project name
 
