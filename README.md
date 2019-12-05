@@ -187,80 +187,116 @@ class Server implements InCS, InCPP, InC {
 ```
  
 
-# Numeric fields value changing dispersion description
+# Numeric fields value changing dispersion
 
 The packet numeric fields can be annotated with `@A, @V, @X, @I` This annotations are denoting the
 meta-information about the pattern of the field value changing. Based on this
 information, code generator can skip or apply [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding)  compression
-algorithm, which allows well and with minimal resource load, reduces the sending data
-amount. This is achieved by excluding from transmission of the higher, not
-filled bytes, and then restoring them on the receiving side.
+algorithm, which allows good and with small resource load, reduces the sending data amount. 
+This is achieved by skipping transmission of the higher, if they are zeros, bytes and then restoring them on the receiving side.
 
-This graph shows the dependence of sending bytes on transferred value
+This graph shows the dependence of sending bytes on transferred value.
 
 ![image](https://user-images.githubusercontent.com/29354319/70126207-84ba9980-16b3-11ea-9900-48251b545eef.png)
 
 It is became clear that with `Base 128 Varint encoding`, smaller value require less bytes to transfer.
-As protocol creator, you know your dat better then any code generator, and annotations are the means by which you pass your knowledge to the generator.
+As protocol creator, you know your numbers better than any generator, and annotations are the means by which you share your knowledge with the generator.
 
-For example, if numeric data have random values, uniformly distributed in full range. Almost as noise.
+For example, if numeric field have random values, uniformly distributed in full range. Almost as noise.
 
 ![image](https://user-images.githubusercontent.com/29354319/70127303-bdf40900-16b5-11ea-94c9-c0dcd045500f.png)
 
 The compression or encoding of this type of data is wasting computation resources. This kind of data is better to transmit as-is.
+This type numeric fields should not have any annotation or have `@I` if needed.
 
-This kind numeric fields should not have any value dispersion annotation or have `@I` if needed.
-
-Otherwise if numeric fields have some dispersion/gradient pattern in its value changing...
+Otherwise, if numeric fields have some dispersion/gradient pattern in its value changing...
 
 ![image](https://user-images.githubusercontent.com/29354319/70128574-0a404880-16b8-11ea-8a4d-efa8a7358dc1.png)
 
 It is possible to leverage this knowledge to minimize the amount of data transmission.
 
-Three main types of distribution of numeric field value changing can be highlighted
+#### Let highlight three basic types of numeric value changing patterns. 
 
-| pattern.             |  description 
+|.....................pattern...............................|  description 
 :-------------------------:|:-------------------------
-![image](https://user-images.githubusercontent.com/29354319/70131681-afa9eb00-16bd-11ea-9fcc-c6637d80114c.png)|Rare fluctuations are possible only in the direction of bigger values relative to most probable value `val`. These numeric field is annotated with  `@A`
-![image](https://user-images.githubusercontent.com/29354319/70130976-7d4bbe00-16bc-11ea-946a-cfa533a09efd.png)|Rare fluctuations are possible in both directions relative to most probable value `val`. These numeric field is annotated with`@X`
-![image](https://user-images.githubusercontent.com/29354319/70131118-bbe17880-16bc-11ea-84a2-2a2a4106a810.png)|Fluctuations are possible only in the direction of smaller values relative to most probable value `val`.These numeric field is annotated with  `@V`
+![image](https://user-images.githubusercontent.com/29354319/70131681-afa9eb00-16bd-11ea-9fcc-c6637d80114c.png)|Rare fluctuations are possible only in the direction of bigger values relative to most probable value `val`. These numeric field is annotated with `@A(val)`
+![image](https://user-images.githubusercontent.com/29354319/70130976-7d4bbe00-16bc-11ea-946a-cfa533a09efd.png)|Rare fluctuations are possible in both directions relative to most probable value `val`. These numeric field is annotated with`@X(val)`
+![image](https://user-images.githubusercontent.com/29354319/70131118-bbe17880-16bc-11ea-84a2-2a2a4106a810.png)|Fluctuations are possible only in the direction of smaller values relative to most probable value `val`.These numeric field is annotated with  `@V(val)`
 
 
-The most probable value  – **val** is passed to code generator as  annotation argument.
+The most probable value  – **val** is passed as annotation argument. this value can be a number @V(-11 ) or it can be pass as range: two number separated by `/` @A(-11 / 75)
 
+ `@A, @V, @X, @I` annotations with _ `@A_, @V_, @X_, @I_` make numeric field `optional` 
 
 ### Using example
 ```java
- @I byte field;           //required field, the field data before sending is not encoded (poorly compressible), and can take values in the range from -128 to 127                      
- @A byte field;           //required field, the data is compressed, the field can take values in the range from 0 to 255. In fact it is an analogy to the type uint8_t in C. 
- @I (-1000) byte field;   //required field, (not to be compressed), the field can take values in the range from -1128 to -873                                                          
- @X_ short field;         //optional field takes values in the range  from -32 768 to 32 767. will be compressed with ZigZag on sending.                                       
- @A (1000) short field;   //required field takes a value between – 1 000 to 65 535 will be compressed on sending.                                                           
- @V_ short field;         //optional field takes a value between  -65 535  to 0  will be compressed on sending.                                                                 
- @I(-11/75) short field;  //required field with uniformly distributed values in the specified range.                                                                                            |
+class Server implements InCS, InCPP, InC {
+	interface ToMyClients {
+		class Pack {
+			@I           byte  field;    //required field, the field data before sending is not encoded (poorly compressible), and can take values in the range from -128 to 127                      
+			@A           byte  field1;   //required field, the data is compressed, the field can take values in the range from 0 to 255. In fact it is an analogy to the type uint8_t in C. 
+			@I(-1000)    byte  field2;   //required field, (not to be compressed), the field can take values in the range from -1128 to -873                                                          
+			@X_          short field3;   //optional field takes values in the range  from -32 768 to 32 767. will be compressed with ZigZag on sending.                                       
+			@A(1000)     short field4;   //required field takes a value between – 1 000 to 65 535 will be compressed on sending.                                                           
+			@V_          short field5;   //optional field takes a value between  -65 535  to 0  will be compressed on sending.                                                                 
+			@I(-11 / 75) short field6;   //required field with uniformly distributed values in the specified range.     
+		}
+	}
+}                                                                                       |
 ```
 
- 
+# Bits fields
+
+In some cases is critical to control and transmit as less data as possible. With `@B( bits )` annotations it is possible to set how many bits will field allocate.
+With `@B( from / to )` form you pass acceptable numbers range and code generator estimate bits amount.  
+
+
+# Enums and constants
+
+To express enums(named constants set) AdHoc protocol use JAVA enum `static`, `final` fields.
+Enums should be declare on the file top-level, next to nodes classes.
+
+```java
+package org.company.some_namespace;
+
+import org.unirail.AdHoc.*;
+
+public class MyDemoProject {}
+
+enum LIMITS_STATE {
+	;
+	
+	final int
+			LIMITS_INIT       = 0, //pre-initialization
+			LIMITS_DISABLED   = 1, //disabled
+			LIMITS_ENABLED    = 2, //checking limits
+			LIMITS_TRIGGERED  = 3, //a limit has been breached
+			LIMITS_RECOVERING = 4, //taking action eg. RTL
+			LIMITS_RECOVERED  = 5;  //we're no longer in breach of a limit
+}
+@Flags enum LIMIT_MODULE {
+	;
+	
+	final int
+			LIMIT_GPSLOCK  = 1, //pre-initialization
+			LIMIT_GEOFENCE = 2, //disabled
+			LIMIT_ALTITUDE = 4;  //checking limits
+}
+
+class Client implements InKT, InTS, InRUST {
+	interface ToServer {
+		class Position {
+			LIMIT_MODULE limit_module;
+			LIMITS_STATE limits_state;
+		}
+	}
+}
+```
+
+`@Flags` annotations denote special Flag Bits enum 
 
 
 
-
-In addition to optimizing traffic, ** BlackBox  **allows you
-
-
-
-### Using example
-| ........................Example.....................| **Description**                                                                                                                                                                                                                                |
-|:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| @D(1 \| 2\| 3) int field1;      | Required multidimensional field with predefined dimensions  **1 x 2 x 3.**   Returns primitives.                                                                                                                                                                         |
-| @A @D( 1 \| 2 \| 3 ) byte field;   | **Required** field multidimensional field with predefined dimensions **1 x 2 x 3.**  Returns primitives with uneven distribution of values upward.                                                                                                     |
-| @A\_ @D( 1 \| 2 \| 3 ) byte field; | **Optional** field is a multidimensional field with predefined dimensions of **1 x 2 x 3.**  When an array is created, all the necessary space is allocated.  Returns primitives with unequal distribution of values upward.                                                             |
-| @A(337) String field;               | Returns a string with a maximum length of 337 bytes                                                                                                                  |
-| @X_(3 / 45) @__( 12) byte field;    | **Optional** field returns an array-items of a predefined length  **12.** The values of the array are in a given range, with uneven distribution in both directions relative to the middle of the range.                                             |
-| @__(-45) int field;               | **Optional** field.  Returns an array of lengths up to **45** ints                                                                                                                                                                                              |
-| @B( 3 ) byte field;                 | Required bit field. Field length 3 bits                                                                                                                                                                                                       |
-| @B_( 12 \| 67 ) byte field;         | **Optional** bit field. The length of the field in bits will be calculated based on the provides values range.                                                                                                                   |
-| @D_(1 \| -2 \| -3)  int  field1;   | A multidimensional field with a predetermined first dimension **1 **while other dimensions are variable. The place for the data, within the maximum values of the dimensions, is allocated only as it is added to the array.   Return primitive int.                 |
 
 
 
