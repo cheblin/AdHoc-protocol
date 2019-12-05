@@ -142,7 +142,7 @@ class Server implements InCS, InCPP, InC {
 }
 ```
 
-# Fields that contain array-items
+# Fields with array-items
 
 Packet field can store array-item: plain array of primitives. This denoted with array-item `@__( length )` annotation.
 If the annotation parameter `length` is:
