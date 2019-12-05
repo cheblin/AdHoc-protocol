@@ -29,13 +29,9 @@ eliminating the discovered shortcomings.
 - generate code adapter to simplify fast exchange data between user objects and  protocol packs 
 - [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding) compression.
 
-To transmit data via the radio channel / raw UART, **AdHoc** protocol has built-in AdvChannel entity with [byte stuffing framing](https://web.cs.wpi.edu/~rek/Undergrad_Nets/B07/BitByteStuff.pdf) and CRC.
- 
-In the case of sending over secure transport or if AdHoc used as a serialization tool of the program data in a file, the StdChannel is using. Booth channel version heavy  <br>
-
 At the moment, the code generator AdHoc is built like **SaaS**. To get the generated and tested code it is necessary:
 
--   install **[JDK 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)** and
+-   install **[JDK 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)** please
     ensure that `javac` (java compiler) is in PATH and accessible from the console.
 -   install any **JAVA** IDE (**[Intellij IDEA](https://www.jetbrains.com/idea/download/)** – just fine)
 -   download [AdHoс protocol annotations](https://github.com/cheblin/AdHoc-protocol/tree/master/org/unirail/AdHoc).
@@ -50,11 +46,67 @@ At the moment, the code generator AdHoc is built like **SaaS**. To get the gener
     the [precompiled jar](https://github.com/cheblin/AdHocAgent/tree/master/bin)
     or compile the utility from provided source by yourself.
 
+As `DSL` AdHoc protocol use java language constructions, in fact protocol description file, is a plain java file. 
+So just create **JAVA** project in your favorite IDE and add reference to [AdHoc protocol annotations](https://github.com/cheblin/AdHoc-protocol/tree/master/src/org/unirail/AdHoc)  
+Create java file in your company `namespace` and import annotations with **import org.unirail.AdHoc.\*;**. 
 
-In fact AdHoc protocol description file, is a plain java file. So just create **JAVA** project in your favorite IDE and add reference to [AdHoc protocol annotations](https://github.com/cheblin/AdHoc-protocol/tree/master/src/org/unirail/AdHoc)  
-and import them in description file with **import org.unirail.AdHoc.\*;**.  
+In the java file, only one top-level class can be `public`. In AdHoc protocol this class name is the protocol project name, and the body not used should be empty.
+```java
+package org.company.some_namespace;
 
-This annotation provides additional meta-information for the code generator.
+import org.unirail.AdHoc.*;
+
+public class MyDemoProject {}
+
+class Server implements InCS, InCPP, InC {
+
+}
+
+class Client implements InKT, InTS, InRUST {
+	
+}
+```
+This file is contains MyDemoProject project.
+
+Other none public top-level file `class` denoted the hosts/nodes that participate in information exchange. 
+The `implements` java keyword denotes the list of the desired target programming languages for the particular host.
+
+Each participant can have several interfaces thru which they exchange the information with others. Interfaces are expressed with java `interface` keyword.
+
+Every interface can contain multiply packs: minimal transmitted information unit. 
+Packs are denoted with `class` construction inside the interface. 
+Pack `class` fields are denoted exact information it contains.
+
+```java
+package org.company.some_namespace;
+
+import org.unirail.AdHoc.*;
+
+public class MyDemoProject {}
+
+class Server implements InCS, InCPP, InC {
+	interface ToMyClients {
+		class Login {
+			@__(20) String login;// max 20 bytes for UTF8 encoded login
+			@__(12) byte   password;//maximum 12 bytes for password hash
+		}
+	}
+}
+
+class Client implements InKT, InTS, InRUST {
+	interface ToServer {
+		class Position {
+			@A long time_usec;//Timestamp (microseconds since system boot or since UNIX epoch)
+			float x;//X Position
+			float y;//Y Position
+			float z;//Z Position
+		}
+	}
+}
+```
+
+
+The pack fields annotations provide additional meta-information for the code generator.
 
 # `Optional` and `required` fields
 
@@ -166,18 +218,18 @@ The following annotations are used to describe multidimensional fields
 ### Using example
 | ........................Example.....................| **Description**                                                                                                                                                                                                                                |
 |:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| @D(1 \| 2\| 3) int field1;      | Mandatory multidimensional array with predefined dimensions  **1 x 2 x 3.**   Returns primitives.                                                                                                                                                                         |
+| @D(1 \| 2\| 3) int field1;      | Required multidimensional field with predefined dimensions  **1 x 2 x 3.**   Returns primitives.                                                                                                                                                                         |
 | @D(1 \| 2 ) @__(3) int field1;   | Multidimensional field with predefined dimensions **1 x 2**  Returns  array-items of **predefined **length **3**.                                                                                                                                    |
 | @D(1 \| 2 ) @__(-3) int field1;  | A multidimensional field with predefined dimensions **1 x 2**   Returns array-items with all same up to **3** length                                                                                                                   |
-| @D(1 \| 2 )  @__(~3) int field1; | Multidimensional array with predefined dimensions **1 x 2**   Returns array-items with individual variable up to **3** length                                                                                                           |
-| @A @D( 1 \| 2 \| 3 ) byte field;   | **Required** field multidimensional array with predefined dimensions **1 x 2 x 3.**  Returns primitives with uneven distribution of values upward.                                                                                                     |
-| @A\_ @D( 1 \| 2 \| 3 ) byte field; | **Optional** field is a multidimensional array with predefined dimensions of **1 x 2 x 3.**  When an array is created, all the necessary space is allocated.  Returns primitives with unequal distribution of values upward.                                                             |
+| @D(1 \| 2 )  @__(~3) int field1; | Multidimensional field with predefined dimensions **1 x 2**   Returns array-items with individual variable up to **3** length                                                                                                           |
+| @A @D( 1 \| 2 \| 3 ) byte field;   | **Required** field multidimensional field with predefined dimensions **1 x 2 x 3.**  Returns primitives with uneven distribution of values upward.                                                                                                     |
+| @A\_ @D( 1 \| 2 \| 3 ) byte field; | **Optional** field is a multidimensional field with predefined dimensions of **1 x 2 x 3.**  When an array is created, all the necessary space is allocated.  Returns primitives with unequal distribution of values upward.                                                             |
 | @A(337) String field;               | Returns a string with a maximum length of 337 bytes                                                                                                                  |
 | @X_(3 / 45) @__( 12) byte field;    | **Optional** field returns an array-items of a predefined length  **12.** The values of the array are in a given range, with uneven distribution in both directions relative to the middle of the range.                                             |
 | @__(-45) int field;               | **Optional** field.  Returns an array of lengths up to **45** ints                                                                                                                                                                                              |
-| @B( 3 ) byte field;                 | Mandatory bit field. Field length 3 bits                                                                                                                                                                                                       |
+| @B( 3 ) byte field;                 | Required bit field. Field length 3 bits                                                                                                                                                                                                       |
 | @B_( 12 \| 67 ) byte field;         | **Optional** bit field. The length of the field in bits will be calculated based on the provides values range.                                                                                                                   |
-| @D_(1 \| -2 \| -3)  int  field1;   | A multidimensional array with a predetermined first dimension **1 **while other dimensions are variable. The place for the data, within the maximum values of the dimensions, is allocated only as it is added to the array.   Return primitive int.                 |
+| @D_(1 \| -2 \| -3)  int  field1;   | A multidimensional field with a predetermined first dimension **1 **while other dimensions are variable. The place for the data, within the maximum values of the dimensions, is allocated only as it is added to the array.   Return primitive int.                 |
 
 
 
@@ -189,6 +241,10 @@ In addition to optimizing traffic, ** BlackBox  **allows you
 
 
 
+
+To transmit data via the radio channel / raw UART, **AdHoc** protocol has built-in AdvChannel entity with [byte stuffing framing](https://web.cs.wpi.edu/~rek/Undergrad_Nets/B07/BitByteStuff.pdf) and CRC.
+ 
+In the case of sending over secure transport or if AdHoc used as a serialization tool of the program data in a file, the StdChannel is using. Booth channel version heavy  <br>
 
 
 
