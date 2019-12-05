@@ -71,9 +71,9 @@ The `implements` java keyword denotes the list of the desired target programming
 
 Each participant can have _several_ interfaces thru which they exchange the information with others. Interfaces are expressed with java `interface` keyword.
 
-Every interface can contain multiply packs, minimal transmitted information unit, that host can **RECEIVE** and handle thru this interface. 
-Packs are denoted with `class` construction inside the interface. 
-Pack `class` fields are denoted exact information it contains.
+Every interface can contain multiple packs that host can **RECEIVE** and handle through this interface.
+Packs are, minimal transmitted information unit, and denoted with `class` java construction inside the interface. 
+Pack `class` fields are a list of exact information it contains.
 
 ```java
 package org.company.some_namespace;
@@ -84,8 +84,8 @@ public class MyDemoProject {}
 
 class Server implements InCS, InCPP, InC {
 	interface ToMyClients {
-		class Login {
-			@__(20) String login;// max 20 bytes for UTF8 encoded login
+		class Login { //    host Server can receive Login packs through ToMyClients interface
+			@__(20) String login;// max 20 bytes for UTF8 encoded login string
 			@__(12) byte   password;//maximum 12 bytes for password hash
 		}
 	}
@@ -93,7 +93,7 @@ class Server implements InCS, InCPP, InC {
 
 class Client implements InKT, InTS, InRUST {
 	interface ToServer {
-		class Position {
+		class Position { //    host Client can receive Position packs through ToServer interface
 			@A long time_usec;//Timestamp (microseconds since system boot or since UNIX epoch)
 			float x;//X Position
 			float y;//Y Position
@@ -102,7 +102,6 @@ class Client implements InKT, InTS, InRUST {
 	}
 }
 ```
-
 
 The pack fields annotations provide additional meta-information for the code generator.
 
@@ -116,9 +115,59 @@ in its turn empty `optional` field allocates in packet just a few bits.
 Any field with primitive or array-item datatype can be made `optional` with a special form of annotation that ends with _ (underscore) `@A_, @V_, @X_, @I_`  
 Before read data from the `optional` field, we need to ensure that it contains any data. 
 
+
+# Multidimensional fields
+
+AdHoc protocol generator recognizes multidimensional fields. They work exactly like a multidimensional array. 
+Some dimensions can have a variable length. Exact length determined at field initialization.
+
+The following annotations are used to describe multidimensional fields
+
+|  |  |
+|-----|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `@D( dims_params )`  | All space for field items is allocated in advance at field initialization.  Used in a case when the field is most likely to be completely filled with items.|
+| `@D_( dims_params )` | Space for items is allocated only when actually item inserted. Used for **sparse** arrays, when the array is most likely to be poorly filled. | 
+
+Dimensions lengths are pass as annotation parameters and  separated with `|` 
+Variable dimensions are denoted with the negative number which value is the maximum dimension length 
+
+```java
+class Server implements InCS, InCPP, InC {
+	interface ToMyClients {
+		class Pack {
+			@D_(1 | 2 | 7) short dim_field;// field of shorts with 1 x 2 x 7 dimensions 
+			@D(1 | 2 | -7) int var_dim_field;//the last dimension has variable, up to 7 length 
+		}
+	}
+}
+```
+
+### Using example
+| ........................Example.....................| **Description**                                                                                                                                                                                                                                |
+|:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| @D(1 \| 2\| 3) int field1;      | Required multidimensional field with predefined dimensions  **1 x 2 x 3.**   Returns primitives.                                                                                                                                                                         |
+| @D(1 \| 2 ) @__(3) int field1;   | Multidimensional field with predefined dimensions **1 x 2**  Returns  array-items of **predefined **length **3**.                                                                                                                                    |
+| @D(1 \| 2 ) @__(-3) int field1;  | A multidimensional field with predefined dimensions **1 x 2**   Returns array-items with all same up to **3** length                                                                                                                   |
+| @D(1 \| 2 )  @__(~3) int field1; | Multidimensional field with predefined dimensions **1 x 2**   Returns array-items with individual variable up to **3** length                                                                                                           |
+| @A @D( 1 \| 2 \| 3 ) byte field;   | **Required** field multidimensional field with predefined dimensions **1 x 2 x 3.**  Returns primitives with uneven distribution of values upward.                                                                                                     |
+| @A\_ @D( 1 \| 2 \| 3 ) byte field; | **Optional** field is a multidimensional field with predefined dimensions of **1 x 2 x 3.**  When an array is created, all the necessary space is allocated.  Returns primitives with unequal distribution of values upward.                                                             |
+| @A(337) String field;               | Returns a string with a maximum length of 337 bytes                                                                                                                  |
+| @X_(3 / 45) @__( 12) byte field;    | **Optional** field returns an array-items of a predefined length  **12.** The values of the array are in a given range, with uneven distribution in both directions relative to the middle of the range.                                             |
+| @__(-45) int field;               | **Optional** field.  Returns an array of lengths up to **45** ints                                                                                                                                                                                              |
+| @B( 3 ) byte field;                 | Required bit field. Field length 3 bits                                                                                                                                                                                                       |
+| @B_( 12 \| 67 ) byte field;         | **Optional** bit field. The length of the field in bits will be calculated based on the provides values range.                                                                                                                   |
+| @D_(1 \| -2 \| -3)  int  field1;   | A multidimensional field with a predetermined first dimension **1 **while other dimensions are variable. The place for the data, within the maximum values of the dimensions, is allocated only as it is added to the array.   Return primitive int.                 |
+
+
+
+
 # Fields that contain array-item
 
-Packet field can store and return array-item, this can be denoted with  array-item `@__( size )` annotation.
+Packet field can store and return array-item: array of primitives. This denoted with array-item `@__( size )` annotation.
+If the annotation parameter `size` is:
+-  45 positive number, this number is the length of the array of the field item.
+- -78 negative: it denote maximum variable length. All field items array have the same length and exact length is determined at field initialization.
+- ~32 with ~ means: maximum variable length. Each field item array has individual variable length fit to inserted data
 
 ### Using example
 
@@ -204,30 +253,6 @@ The most probable value  – **val** is passed to code generator as  annotati
 
  
 
-# Multidimensional fields  description
-
-The following annotations are used to describe multidimensional fields
-
-|  |  |
-|-----|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `@D`  | All space for field data is allocated in advance as field initialized.  Used in a case when it is known that the array is most likely to be completely filled with data. Even if the data is not set – the  space for it is allocated, but there is no resource wasted on tracking the fullness of the data. |
-| `@D_` | Space for data is allocated only when actually data inserted. Used for **sparse** arrays, when it is known that the array is most likely to be poorly filled.  There are additional costs associated with tracking the fullness of the data.     | 
-
-### Using example
-| ........................Example.....................| **Description**                                                                                                                                                                                                                                |
-|:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| @D(1 \| 2\| 3) int field1;      | Required multidimensional field with predefined dimensions  **1 x 2 x 3.**   Returns primitives.                                                                                                                                                                         |
-| @D(1 \| 2 ) @__(3) int field1;   | Multidimensional field with predefined dimensions **1 x 2**  Returns  array-items of **predefined **length **3**.                                                                                                                                    |
-| @D(1 \| 2 ) @__(-3) int field1;  | A multidimensional field with predefined dimensions **1 x 2**   Returns array-items with all same up to **3** length                                                                                                                   |
-| @D(1 \| 2 )  @__(~3) int field1; | Multidimensional field with predefined dimensions **1 x 2**   Returns array-items with individual variable up to **3** length                                                                                                           |
-| @A @D( 1 \| 2 \| 3 ) byte field;   | **Required** field multidimensional field with predefined dimensions **1 x 2 x 3.**  Returns primitives with uneven distribution of values upward.                                                                                                     |
-| @A\_ @D( 1 \| 2 \| 3 ) byte field; | **Optional** field is a multidimensional field with predefined dimensions of **1 x 2 x 3.**  When an array is created, all the necessary space is allocated.  Returns primitives with unequal distribution of values upward.                                                             |
-| @A(337) String field;               | Returns a string with a maximum length of 337 bytes                                                                                                                  |
-| @X_(3 / 45) @__( 12) byte field;    | **Optional** field returns an array-items of a predefined length  **12.** The values of the array are in a given range, with uneven distribution in both directions relative to the middle of the range.                                             |
-| @__(-45) int field;               | **Optional** field.  Returns an array of lengths up to **45** ints                                                                                                                                                                                              |
-| @B( 3 ) byte field;                 | Required bit field. Field length 3 bits                                                                                                                                                                                                       |
-| @B_( 12 \| 67 ) byte field;         | **Optional** bit field. The length of the field in bits will be calculated based on the provides values range.                                                                                                                   |
-| @D_(1 \| -2 \| -3)  int  field1;   | A multidimensional field with a predetermined first dimension **1 **while other dimensions are variable. The place for the data, within the maximum values of the dimensions, is allocated only as it is added to the array.   Return primitive int.                 |
 
 
 
