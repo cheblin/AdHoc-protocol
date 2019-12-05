@@ -66,12 +66,12 @@ class Client implements InKT, InTS, InRUST {
 	
 }
 ```
-Other **none public** top-level file `class` denoted the hosts/nodes that participate in information exchange. 
+Other **none public** top-level file `class` denoted the host/node/device/unit that participate in information exchange. 
 The `implements` java keyword denotes the list of the desired target programming languages for the particular host.
 
-Each participant can have several interfaces thru which they exchange the information with others. Interfaces are expressed with java `interface` keyword.
+Each participant can have _several_ interfaces thru which they exchange the information with others. Interfaces are expressed with java `interface` keyword.
 
-Every interface can contain multiply packs: minimal transmitted information unit. 
+Every interface can contain multiply packs, minimal transmitted information unit, that host can **RECEIVE** and handle thru this interface. 
 Packs are denoted with `class` construction inside the interface. 
 Pack `class` fields are denoted exact information it contains.
 
