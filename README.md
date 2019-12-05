@@ -219,7 +219,7 @@ It is possible to leverage this knowledge to minimize the amount of data transmi
 
 Three main types of distribution of numeric field value changing can be highlighted
 
-| pattern             |  description 
+| ................pattern....................             |  description 
 :-------------------------:|:-------------------------
 ![image](https://user-images.githubusercontent.com/29354319/70131681-afa9eb00-16bd-11ea-9fcc-c6637d80114c.png)|Rare fluctuations are possible only in the direction of bigger values relative to most probable value `val`. These numeric field is annotated with  `@A`
 ![image](https://user-images.githubusercontent.com/29354319/70130976-7d4bbe00-16bc-11ea-946a-cfa533a09efd.png)|Rare fluctuations are possible in both directions relative to most probable value `val`. These numeric field is annotated with`@X`
