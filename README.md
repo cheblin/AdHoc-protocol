@@ -52,11 +52,11 @@ Create java file in your company `namespace` and import annotations with **impor
 
 In the java file, only one top-level class can be `public` and it name should be the same as file name. In AdHoc protocol this class name is the protocol project name, and the body not used should be empty.
 ```java
-package org.company.some_namespace;// You project namespace. required!
+package org.company.some_namespace;// You project namespace. Required!
 
 import org.unirail.AdHoc.*;//        importing AdHoc protocol annotations 
 
-public class MyDemoProject {} //AdHoc protocol project name
+public class MyDemoProject {} //this public class name is AdHoc protocol project name
 
 class Server implements InCS, InCPP, InC { //for this host code will be generated in C#, C++ and C
 
@@ -66,7 +66,7 @@ class Client implements InKT, InTS, InRUST {
 	
 }
 ```
-Other none public top-level file `class` denoted the hosts/nodes that participate in information exchange. 
+Other **none public** top-level file `class` denoted the hosts/nodes that participate in information exchange. 
 The `implements` java keyword denotes the list of the desired target programming languages for the particular host.
 
 Each participant can have several interfaces thru which they exchange the information with others. Interfaces are expressed with java `interface` keyword.
