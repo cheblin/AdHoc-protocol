@@ -144,11 +144,11 @@ class Server implements InCS, InCPP, InC {
 
 # Fields with array-items
 
-Packet field can store array-item: plain array of primitives. This denoted with array-item `@__( length )` annotation.
+Packet field can store array-item: a plain array of primitives. This denoted with array-item `@__( length )` annotation.  
 If the annotation parameter `length` is:
--  45 positive number, this number is the length of the array of the item.
-- -78 negative. The number is the maximum array variable length. All field array-items have the same length. The exact length is determined at field initialization.
-- ~32 with ~ . The number is the maximum array variable length. Each field array-item have individual variable length fit to inserted data
+-  45 - positive number, this number is the length of the array of the item.
+- -78 - negative. The number is the maximum array variable length. All field array-items have the same length. The exact length is determined at field initialization.
+- ~32 - with ~ . The number is the maximum array variable length. Each field array-item have individual variable length, fit to inserted data
 
 ### Using example
 
@@ -170,16 +170,21 @@ class Server implements InCS, InCPP, InC {
 # String fields
 
 Strings in AdHoc protocol on all languages are encoded in UTF-8 byte array. By default, without annotation, a string can allocate at most 256 bytes. 
-This default length can be changed with array-item `@__( size )` annotation.
+This default length can be changed with array-item `@__( length )` annotation.
 All string fields are optional, it means it can be NULL ( does not contain any value).
 
 ### Using example
 
-```java 
-String  at_most_256_bytes_string; // field hold string with default, at most 265 bytes length 
-
-@__( 1024 ) String at_most_1024_bytes_string; // field with string that syze at most 1024 bytes length 
-``` 
+```java
+class Server implements InCS, InCPP, InC {
+	interface ToMyClients {
+		class Pack {
+			String  at_most_256_bytes_string; // field hold string with default, at most 265 bytes length 
+			@__( 1024 ) String at_most_1024_bytes_string; // field with string that syze at most 1024 bytes length 
+		}
+	}
+}
+```
  
 
 # Numeric fields value changing dispersion description
