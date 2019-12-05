@@ -48,9 +48,22 @@ At the moment, the code generator AdHoc is built like **SaaS**. To get the gener
 
 As `DSL` AdHoc protocol use java language constructions, in fact protocol description file, is a plain java file. 
 So just create **JAVA** project in your favorite IDE and add reference to [AdHoc protocol annotations](https://github.com/cheblin/AdHoc-protocol/tree/master/src/org/unirail/AdHoc)  
-Create java file in your company `namespace` and import annotations with **import org.unirail.AdHoc.\*;**. 
+Create java file in your company namespace and import annotations with **import org.unirail.AdHoc.\*;**. 
 
-In the java file, only one top-level class can be `public` and it name should be the same as file name. In AdHoc protocol this class name is the protocol project name, and the body not used should be empty.
+Regarding naming in your protocol specification. You cannot use names which start/end with `_` underscore. 
+Using programming keywords of any programming language that AdHoc protocol generator support are prohibited.
+**AdHocAgent** is checking used in protocol specification names before upload to server generator.
+
+In the java file, only **one** top-level class can be `public` and it name should be the same as file name. 
+In AdHoc protocol treat this name as the protocol project name.
+
+# Network topology
+
+Most, similar AdHoc protocol, solutions are a concern only on information that nodes exchange.
+AdHoc protocol specification requires to describe full network topology: nodes, channels and packs.
+
+**None public** file top-level `class` denoted the host/node/device/unit that participate in information exchange. 
+ 
 ```java
 package org.company.some_namespace;// You project namespace. Required!
 
@@ -66,7 +79,6 @@ class Client implements InKT, InTS, InRUST {
 	
 }
 ```
-Other **none public** top-level file `class` denoted the host/node/device/unit that participate in information exchange. 
 The `implements` java keyword denotes the list of the desired target programming languages for the particular host.
 
 Each participant can have _several_ interfaces thru which they exchange the information with others. Interfaces are expressed with java `interface` keyword.
@@ -98,10 +110,61 @@ class Client implements InKT, InTS, InRUST {
 			float x;//X Position
 			float y;//Y Position
 			float z;//Z Position
+			
+			final int  int_constant  = 34; // Position pack constant
+			final byte byte_constant = 2;
 		}
 	}
 }
 ```
+Pack `class`, internal `static`, `final` fields **with primitive datatype** AdHoc generator treat as packet constants.
+
+# Enums
+
+To express enums(named constants set) AdHoc protocol use JAVA enum `static`, `final` fields.
+Enums declare at the file top-level, next to nodes classes.
+
+```java
+package org.company.some_namespace;
+
+import org.unirail.AdHoc.*;
+
+public class MyDemoProject {}
+
+enum LIMITS_STATE {
+	;
+	
+	final int
+			LIMITS_INIT       = 0, //pre-initialization
+			LIMITS_DISABLED   = 1, //disabled
+			LIMITS_ENABLED    = 2, //checking limits
+			LIMITS_TRIGGERED  = 3, //a limit has been breached
+			LIMITS_RECOVERING = 4, //taking action eg. RTL
+			LIMITS_RECOVERED  = 5;  //we're no longer in breach of a limit
+}
+
+@Flags enum LIMIT_MODULE {
+	;
+	
+	final int
+			LIMIT_GPSLOCK  = 1, //pre-initialization
+			LIMIT_GEOFENCE = 2, //disabled
+			LIMIT_ALTITUDE = 4;  //checking limits
+}
+
+class Client implements InKT, InTS, InRUST {
+	interface ToServer {
+		class Position {
+			LIMIT_MODULE limit_module;
+			LIMITS_STATE limits_state;
+		}
+	}
+}
+```
+
+**Please pay attention: enum has empty body with ; (semicolon) and `final`keyword** this is a requirement  
+`@Flags` annotations denote special Flag Bits enum.
+
 
 The pack fields annotations provide additional meta-information for the code generator.
 
@@ -247,53 +310,10 @@ class Server implements InCS, InCPP, InC {
 
 # Bits fields
 
-In some cases is critical to control and transmit as less data as possible. With `@B( bits )` annotations it is possible to set how many bits will field allocate.
-With `@B( from / to )` form you pass acceptable numbers range and code generator estimate bits amount.  
+In some cases is critical to transmitting as little bytes as possible. `@B( bits )` annotation denote how many bits will field allocate.
+With `@B( from / to )` form let you set acceptable numbers range and code generator estimate bits amount.  
 
 
-# Enums and constants
-
-To express enums(named constants set) AdHoc protocol use JAVA enum `static`, `final` fields.
-Enums should be declare on the file top-level, next to nodes classes.
-
-```java
-package org.company.some_namespace;
-
-import org.unirail.AdHoc.*;
-
-public class MyDemoProject {}
-
-enum LIMITS_STATE {
-	;
-	
-	final int
-			LIMITS_INIT       = 0, //pre-initialization
-			LIMITS_DISABLED   = 1, //disabled
-			LIMITS_ENABLED    = 2, //checking limits
-			LIMITS_TRIGGERED  = 3, //a limit has been breached
-			LIMITS_RECOVERING = 4, //taking action eg. RTL
-			LIMITS_RECOVERED  = 5;  //we're no longer in breach of a limit
-}
-@Flags enum LIMIT_MODULE {
-	;
-	
-	final int
-			LIMIT_GPSLOCK  = 1, //pre-initialization
-			LIMIT_GEOFENCE = 2, //disabled
-			LIMIT_ALTITUDE = 4;  //checking limits
-}
-
-class Client implements InKT, InTS, InRUST {
-	interface ToServer {
-		class Position {
-			LIMIT_MODULE limit_module;
-			LIMITS_STATE limits_state;
-		}
-	}
-}
-```
-
-`@Flags` annotations denote special Flag Bits enum 
 
 
 
