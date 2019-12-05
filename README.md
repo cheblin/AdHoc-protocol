@@ -50,15 +50,15 @@ As `DSL` AdHoc protocol use java language constructions, in fact protocol descri
 So just create **JAVA** project in your favorite IDE and add reference to [AdHoc protocol annotations](https://github.com/cheblin/AdHoc-protocol/tree/master/src/org/unirail/AdHoc)  
 Create java file in your company `namespace` and import annotations with **import org.unirail.AdHoc.\*;**. 
 
-In the java file, only one top-level class can be `public`. In AdHoc protocol this class name is the protocol project name, and the body not used should be empty.
+In the java file, only one top-level class can be `public` and it name should be the same as file name. In AdHoc protocol this class name is the protocol project name, and the body not used should be empty.
 ```java
 package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {}
+public class MyDemoProject {} //AdHoc protocol project name
 
-class Server implements InCS, InCPP, InC {
+class Server implements InCS, InCPP, InC { //for this host code will be generated in C#, C++ and C
 
 }
 
@@ -66,8 +66,6 @@ class Client implements InKT, InTS, InRUST {
 	
 }
 ```
-This file is contains MyDemoProject project.
-
 Other none public top-level file `class` denoted the hosts/nodes that participate in information exchange. 
 The `implements` java keyword denotes the list of the desired target programming languages for the particular host.
 
