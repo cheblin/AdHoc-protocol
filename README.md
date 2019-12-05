@@ -123,7 +123,7 @@ Some dimensions can have a variable length. Exact length determined at field ini
 
 The following annotations are used to describe multidimensional fields
 
-|  |  |
+|...................  |  |
 |-----|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `@D( dims_params )`  | All space for field items is allocated in advance at field initialization.  Used in a case when the field is most likely to be completely filled with items.|
 | `@D_( dims_params )` | Space for items is allocated only when actually item inserted. Used for **sparse** arrays, when the array is most likely to be poorly filled. | 
