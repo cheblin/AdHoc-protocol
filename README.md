@@ -178,8 +178,8 @@ On receiving this description, the server generates the following API. (Some min
 It becomes apparent that channel not-connected interfaces are ignored.
 The presence `onFirstPack` methods on the `Server`  `ClientServerLink` channel, let Server receive `FirstPack` packet and `sendServerParams` method let it send `ServerParams` pack.
 
->Java keyword `extends` **on nodes communications interfaces** let "inherit" packs declarations from other interfaces   
-But `implements` **on packet** some communication interface, let packet be inserted in destination interfaces
+>Java keyword `extends` **on nodes communications interfaces** let "inherit" packs declarations from other interfaces. Absolutely like in java.  
+But keyword `implements` of some communication interface, **on packet**, let this packet be embedded into "implemented" interfaces. The "opposite" of what happens in java 
 
 Let see how is it works. Let change specification a bit
 ```java
@@ -238,13 +238,41 @@ so `Server` and `Client` can send and receive them.
 
 In additional packet `Job` from `IWoker` interface embedded `Server.ToMyClients` interface. Absolutely like `FirstPack`
 
+# Channels
 
+To join nodes interfaces, AdHoc protocol has channels entities.  
+Like nodes, they declare at the top-level of description file with java `class` construction and consist of three parts.
+Channel type after `extends` keywords and two connected interfaces after `implements`.
+```java
+package org.company.some_namespace;
 
+import org.unirail.AdHoc.*;
 
+public class MyDemoProject {}
+
+class Server implements InCS, InCPP, InC {
+	interface ToMyClients { // node interface
+		class FirstPack {}
+	}
+}
+
+class Client implements InKT, InTS, InRUST {
+	interface ToServer {} // node interface 
+}
+
+class ClientServerLink extends AdvProtocol //channel type
+		implements
+		Client.ToServer, // connected interfaces
+				Server.ToMyClients {}
+```
+
+To transmit data via the radio channel / raw UART, use `AdvChannel` type entity. 
+It builtin [byte stuffing framing](https://web.cs.wpi.edu/~rek/Undergrad_Nets/B07/BitByteStuff.pdf) to fast recover after channel failure and CRC.  
+If data are sending over secure transport or if AdHoc used as a serialization tool of the program data in a file, the `StdChannel` type is using.
 
 # Enums
 
-To express enums(named constants set) AdHoc protocol use JAVA enum `static`, `final` fields.
+To express enums (named constants set) AdHoc protocol use JAVA enum `static`, `final` fields.
 Enums declare at the file top-level, next to nodes classes.
 
 ```java
@@ -284,10 +312,14 @@ class Client implements InKT, InTS, InRUST {
 	}
 }
 ```
-
-> **Please pay attention: enum has empty body with ; (semicolon) and `final`keyword** this is a requirement    
-
 `@Flags` annotations denote special Flag Bits enum.
+
+Not initialized enum fields are automatically assigned integer values. If enum has `@Flags` annotation, generated value respectively is bit flags like.
+If you want full control on enum fields type (*only integer types are supported) and values, use `static` `final` fields.  
+
+> **Please pay attention:** if enum has only static fields, its body cannot be empty, should have at least ; (semicolon)
+
+
 
 
 The pack fields annotations provide additional meta-information for the code generator.
@@ -439,41 +471,9 @@ With `@B( from / to )` form let you set acceptable numbers range and code genera
 
 
 
-# Channels
-
-
-To connect nodes interfaces AdHoc protocol has channels. They are declare at the top-level of description file with java `class` construction and consist from three parts.
-Type, and two interfaces it connect.   
-```java
-package org.company.some_namespace;
-
-import org.unirail.AdHoc.*;
-
-public class MyDemoProject {}
-
-class Server implements InCS, InCPP, InC {
-	interface ToMyClients { // node interface
-		class FirstPack {}
-	}
-}
-
-class Client implements InKT, InTS, InRUST {
-	interface ToServer {} // node interface 
-}
-
-class ClientServerLink extends AdvProtocol //channel type
-		implements
-		Client.ToServer, // connected interfaces
-				Server.ToMyClients {}
-
-```
 
 
 
-
-To transmit data via the radio channel / raw UART, **AdHoc** protocol has built-in AdvChannel entity with [byte stuffing framing](https://web.cs.wpi.edu/~rek/Undergrad_Nets/B07/BitByteStuff.pdf) and CRC.
- 
-In the case of sending over secure transport or if AdHoc used as a serialization tool of the program data in a file, the StdChannel is using. Booth channel version heavy  <br>
 
 
 
