@@ -85,7 +85,7 @@ Each participant can have _several_ interfaces thru which they exchange the info
 
 Every interface can contain multiple packs that host can **RECEIVE** and handle through this interface.
 Packs are, minimal transmitted information unit, and denoted with `class` java construction inside the interface. 
-Pack `class` fields are a list of exact information it contains.
+Pack `class` fields are a list of exact information it contains. Packages names must be unique.
 
 ```java
 package org.company.some_namespace;
@@ -97,8 +97,8 @@ public class MyDemoProject {}
 class Server implements InCS, InCPP, InC {
 	interface ToMyClients {
 		class Login { //    host Server can receive Login packs through ToMyClients interface
-			@__(20) String login;// max 20 bytes for UTF8 encoded login string
-			@__(12) byte   password;//maximum 12 bytes for password hash
+			@__(20) String login;// max 20 bytes array for UTF8 encoded login string
+			@__(12) byte   password;//maximum 12 bytes array for password hash
 		}
 	}
 }
@@ -111,13 +111,136 @@ class Client implements InKT, InTS, InRUST {
 			float y;//Y Position
 			float z;//Z Position
 			
-			final int  int_constant  = 34; // Position pack constant
+			final int  int_constant  = 34; //pack constants
 			final byte byte_constant = 2;
 		}
 	}
 }
 ```
-Pack `class`, internal `static`, `final` fields **with primitive datatype** AdHoc generator treat as packet constants.
+Packet `class`, internal `static`, `final` fields **with primitive datatype**, AdHoc generator treat as packet constants.
+
+  
+
+For example a protocol description
+```java
+package org.company.some_namespace;
+
+import org.unirail.AdHoc.*;
+
+public class MyDemoProject {}
+
+class Server implements InCS, InCPP, InC {
+	interface ToMyClients { // node interface
+		class FirstPack {}
+	}
+	
+	interface IWoker {
+		class Job {}// Job Packet
+	}
+	
+	interface ILogger {
+		
+		class Log {}
+	}
+	
+	interface IDispatcher {
+		class Dispatch {}
+	}
+	
+	interface CommonPacks {
+		class Pack1 {}
+		
+		class Pack2 {}
+		
+		class Pack3 {}
+	}
+}
+
+class Client implements InKT, InTS, InRUST {
+	interface ToServer { // Client communication interface
+		
+		class ServerParams {}
+	}
+}
+
+class ClientServerLink extends AdvProtocol //channel type
+		implements
+		Client.ToServer, // connected interfaces
+				Server.ToMyClients {}
+
+```
+On receiving this description, the server generates the following API. (Some minor elements are skipped.)
+
+![image](https://user-images.githubusercontent.com/29354319/70285706-6c599480-1803-11ea-9e0a-d0e4ddd07c9e.png)
+
+`Server` API image was taken from C# generated code.  
+`Client` API from the Typescript version.  
+It becomes apparent that channel not-connected interfaces are ignored.
+The presence `onFirstPack` methods on the `Server`  `ClientServerLink` channel, let Server receive `FirstPack` packet and `sendServerParams` method let it send `ServerParams` pack.
+
+>Java keyword `extends` **on nodes communications interfaces** let "inherit" packs declarations from other interfaces   
+But `implements` **on packet** some communication interface, let packet be inserted in destination interfaces
+
+Let see how is it works. Let change specification a bit
+```java
+package org.company.some_namespace;
+
+import org.unirail.AdHoc.*;
+
+public class MyDemoProject {}
+
+class Server implements InCS, InCPP, InC {
+	interface ToMyClients extends CommonPacks { // ToMyClients interface inherit all packs from CommonPacks
+		class FirstPack {}
+	}
+	
+	interface IWoker {
+		class Job implements ToMyClients {}  // Job Packet will be inserted in to ToMyClients interface
+	}
+	
+	interface ILogger {
+		
+		class Log {}
+	}
+	
+	interface IDispatcher {
+		class Dispatch {}
+	}
+	
+	interface CommonPacks {
+		class Pack1 {}
+		
+		class Pack2 {}
+		
+		class Pack3 {}
+	}
+}
+
+class Client implements InKT, InTS, InRUST {
+	interface ToServer extends Server.CommonPacks { // Client communication interface
+		
+		class ServerParams {}
+	}
+}
+
+class ClientServerLink extends AdvProtocol //channel type
+		implements
+		Client.ToServer, // connected interfaces
+				Server.ToMyClients {}
+```
+
+
+
+![image](https://user-images.githubusercontent.com/29354319/70288179-1b01d300-180c-11ea-8e09-d679f7f9af6e.png)
+
+All packs: `Pack1`, `Pack2`, `Pack3` from  `CommonPacks` interface now embedded into  `Server.ToMyClients` interface and in `Client.ToServer` interface, 
+so `Server` and `Client` can send and receive them.
+
+In additional packet `Job` from `IWoker` interface embedded `Server.ToMyClients` interface. Absolutely like `FirstPack`
+
+
+
+
 
 # Enums
 
@@ -162,7 +285,8 @@ class Client implements InKT, InTS, InRUST {
 }
 ```
 
-**Please pay attention: enum has empty body with ; (semicolon) and `final`keyword** this is a requirement  
+> **Please pay attention: enum has empty body with ; (semicolon) and `final`keyword** this is a requirement    
+
 `@Flags` annotations denote special Flag Bits enum.
 
 
@@ -305,7 +429,7 @@ class Server implements InCS, InCPP, InC {
 			@I(-11 / 75) short field6;   //required field with uniformly distributed values in the specified range.     
 		}
 	}
-}                                                                                       |
+}                                                                                    
 ```
 
 # Bits fields
@@ -315,11 +439,34 @@ With `@B( from / to )` form let you set acceptable numbers range and code genera
 
 
 
+# Channels
 
 
+To connect nodes interfaces AdHoc protocol has channels. They are declare at the top-level of description file with java `class` construction and consist from three parts.
+Type, and two interfaces it connect.   
+```java
+package org.company.some_namespace;
 
+import org.unirail.AdHoc.*;
 
+public class MyDemoProject {}
 
+class Server implements InCS, InCPP, InC {
+	interface ToMyClients { // node interface
+		class FirstPack {}
+	}
+}
+
+class Client implements InKT, InTS, InRUST {
+	interface ToServer {} // node interface 
+}
+
+class ClientServerLink extends AdvProtocol //channel type
+		implements
+		Client.ToServer, // connected interfaces
+				Server.ToMyClients {}
+
+```
 
 
 
