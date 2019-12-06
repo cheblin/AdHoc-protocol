@@ -233,10 +233,10 @@ class ClientServerLink extends AdvProtocol //channel type
 
 ![image](https://user-images.githubusercontent.com/29354319/70288179-1b01d300-180c-11ea-8e09-d679f7f9af6e.png)
 
-All packs: `Pack1`, `Pack2`, `Pack3` from  `CommonPacks` interface now embedded into  `Server.ToMyClients` interface and in `Client.ToServer` interface, 
-so `Server` and `Client` can send and receive them.
+All packs: `Pack1`, `Pack2`, `Pack3` from  `CommonPacks` interface now embedded into  `Server.ToMyClients` and `Client.ToServer` interfaces.   
+So `Server` and `Client` can send and receive them.
 
-In additional packet `Job` from `IWoker` interface embedded `Server.ToMyClients` interface. Absolutely like `FirstPack`
+In additional, packet `Job` from `IWoker` interface embedded `Server.ToMyClients` interface. Became `FirstPack` neighbour
 
 # Channels
 
