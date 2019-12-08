@@ -85,7 +85,9 @@ Each participant can have _several_ interfaces thru which they exchange the info
 
 Every interface can contain multiple packs that host can **RECEIVE** and handle through this interface.
 Packs are, minimal transmitted information unit, and denoted with `class` java construction inside the interface. 
-Pack `class` fields are a list of exact information it contains. Packages names must be unique.
+> **Packets names should be unique!**  
+ 
+Pack `class` fields are a list of exact information it contains. 
 
 ```java
 package org.company.some_namespace;
@@ -171,6 +173,7 @@ class ClientServerLink extends AdvProtocol //channel type
 ```
 On receiving this description, the server generates the following API. (Some minor elements are skipped.)
 
+
 ![image](https://user-images.githubusercontent.com/29354319/70285706-6c599480-1803-11ea-9e0a-d0e4ddd07c9e.png)
 
 `Server` API image was taken from C# generated code.  
@@ -178,10 +181,15 @@ On receiving this description, the server generates the following API. (Some min
 It becomes apparent that channel not-connected interfaces are ignored.
 The presence `onFirstPack` methods on the `Server`  `ClientServerLink` channel, let Server receive `FirstPack` packet and `sendServerParams` method let it send `ServerParams` pack.
 
->Java keyword `extends` **on nodes communications interfaces** let "inherit" packs declarations from other interfaces. Absolutely like in java.  
-But keyword `implements` of some communication interface, **on packet**, let this packet be embedded into "implemented" interfaces. The "opposite" of what happens in java 
+> * **on nodes communications `interfaces`**:  java keyword `extends`  let "inherit" packs declarations from other interfaces. 
+> * **after packet `class`** declaration, the keyword : 
+>  * `implements` of communication interfaces, let this packet be embedded into "implemented" interfaces. 
+>  * `extends` of some other packet `class`, let to inherit fields from other packet
 
 Let see how is it works. Let change specification a bit
+
+
+
 ```java
 package org.company.some_namespace;
 
@@ -236,7 +244,66 @@ class ClientServerLink extends AdvProtocol //channel type
 All packs: `Pack1`, `Pack2`, `Pack3` from  `CommonPacks` interface now embedded into  `Server.ToMyClients` and `Client.ToServer` interfaces.   
 So `Server` and `Client` can send and receive them.
 
-In additional, packet `Job` from `IWoker` interface jump into `Server.ToMyClients` interface, and became `FirstPack` neighbour.
+In additional, packet `Job` from `IWoker` interface jumps into `Server.ToMyClients` interface, and become `FirstPack` neighbor.
+
+If we take a look at our protocol description now it's changed by the server.
+```java
+package org.company.some_namespace;
+
+import org.unirail.AdHoc.*;
+
+public class MyDemoProject {}
+
+class Server implements InCS, InCPP, InC {
+	interface ToMyClients extends CommonPacks { // node interface
+	@id(0)
+	class FirstPack {}
+	}
+	
+	interface IWoker {
+	@id(1)
+	class Job implements ToMyClients {}  // Job Packet
+	}
+	
+	interface ILogger {// Server communication interface
+		
+	@id(2)
+	class Log {}
+	}
+	
+	interface IDispatcher {
+	@id(3)
+	class Dispatch {}
+	}
+	
+	interface CommonPacks {
+	@id(4)
+	class Pack1 {}
+		
+	@id(5)
+	class Pack2 {}
+		
+	@id(6)
+	class Pack3 {}
+	}
+}
+
+class Client implements InKT, InTS, InRUST {
+	interface ToServer extends Server.CommonPacks { // Client communication interface
+		
+	@id(7)
+	class ServerParams {}
+	}
+}
+
+class ClientServerLink extends AdvProtocol //channel type
+		implements
+		Client.ToServer, // connected interfaces
+				Server.ToMyClients {}
+```
+
+ The server assigns `id` annotation with a unique number to every packet that has not. Keep this `Id` if you concern backward compatibility
+
 
 # Channels
 
@@ -283,7 +350,12 @@ import org.unirail.AdHoc.*;
 public class MyDemoProject {}
 
 enum LIMITS_STATE {
-	;
+	AQ_NAV_STATUS_INIT,
+	AQ_NAV_STATUS_STANDBY,
+	AQ_NAV_STATUS_MANUAL,
+	AQ_NAV_STATUS_ALTHOLD,
+	AQ_NAV_STATUS_POSHOLD,
+	AQ_NAV_STATUS_GUIDED;
 	
 	final int
 			LIMITS_INIT       = 0, //pre-initialization
@@ -314,11 +386,10 @@ class Client implements InKT, InTS, InRUST {
 ```
 `@Flags` annotations denote special Flag Bits enum.
 
-Not initialized enum fields are automatically assigned integer values. If enum has `@Flags` annotation, generated value respectively is bit flags like.
-If you want full control on enum fields type (*only integer types are supported) and values, use `static` `final` fields.  
+Not initialized enum fields are automatically assigned integer values. If enum has `@Flags` annotation, generated value respectively: is bit flags like.
+If you need full control on enum fields type (*only integer types are supported) and values, use `static` `final` fields.  
 
 > **Please pay attention:** if enum has only static fields, its body cannot be empty, should have at least ; (semicolon)
-
 
 
 
@@ -469,37 +540,6 @@ class Server implements InCS, InCPP, InC {
 In some cases is critical to transmitting as little bytes as possible. `@B( bits )` annotation denote how many bits will field allocate.
 With `@B( from / to )` form let you set acceptable numbers range and code generator estimate bits amount.  
 
+# Nested packets
 
-
-
-
-
-
-
-
-And following a [small set of rules](http://www.unirail.org/), describe packets, channels, Hosts, communication interfaces, network topology.
-- Verify that the specification is successfully compiled, and checkout [ClientAgent](https://github.com/cheblin/ClientAgent) rename one of .properties file to client.properties change it content according you email account. Run ClientAgent and in a few second/minutes get generated code, next to your protocol description. You will get generated source code, according to specification, in requested programming languages, last passed test and an example of using generated API. If an error occurred, you will be notified of a possible delay and the AdHoc support service is dealing with the difficulties encountered.
-
-[Here you can find an example of the generated code](https://github.com/cheblin/AdHoc_LEDBlink_Demo/tree/master/Generated), and here an [example of usage of this code](https://github.com/cheblin/AdHoc_LEDBlink_Demo/tree/master/Examples/STM8) in the above-mentioned demonstration control project with android LED flashes on the demo PCB assembled on STM8.
-
-Using AdHoc, you can easily establish communication not only between microcontrollers, mobile devices but also between the ordinary computers. And what is important, without time and effort waste. In fact, the generated AdHoc code can become the skeleton of your distributed application. The programmer will just have to add handlers to the packet&#39;s reception events, as well as the logic for creating the package, populating it with data and sending it to the recipient.
-
-
-# AdHoc description file
-Basic documentation of the description file format can be found **[here](http://www.unirail.org).** Let's take a look how [**LedBlinkProject** demo description file](https://github.com/cheblin/AdHoc_LEDBlink_Demo) looks like
-![descriptionscheme](http://www.unirail.org/wp-content/uploads/2017/12/Capture2.png)
-
-# AdHoc parts relationship scheme
-
-![OverallScheme](http://www.unirail.org/wp-content/uploads/2017/12/OverallScheme.png)
-
-# How to get generated source code
-
-1. Install **Intellij** [IDEA](https://www.jetbrains.com/idea/download/#section=windows) or, if you are planning to deploy your code on Android devices, [Android Studio.](https://developer.android.com/studio/index.html)
-2. Download [AdHoc metadata annotations](https://github.com/cheblin/AdHoc/tree/master/org/unirail/AdHoc)
-3. Create a new java Project in your IDE and make reference to downloaded metadata annotations. (On **Android Studio** you have to [add JAVA Library module](https://developer.android.com/studio/projects/android-library.html) or edit  [build.gradle](https://github.com/cheblin/AdHoc_LEDBlink_Demo/blob/master/Examples/Android/app/build.gradle) file. Find/add **java.srcDirs** option.)
-3. Compose your protocol description file (it should be in UTF8 encoding). **[Rules.](http://www.unirail.org/)**
-4. Ensure that description file can me compiled without any errors.
-5. Upload your protocol descriptor file with [ClientAgent](https://github.com/cheblin/ClientAgent)
-6. In a short time getting your generated, fully tested source code in reply.<br>
-In addition it will contain **Demo and Test** file - examples of using generated API and one of the passsed test, respectively.
+As enums can be any field datatype, any packet can become, field datatype. Packets enclosing can be as deep as it needed. Cycle enclosing is prohibited.
