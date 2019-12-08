@@ -10,11 +10,11 @@ Some examples of solutions build in this way:
 [MAVLink ](https://github.com/mavlink/mavlink)  
 [Thrift](https://thrift.apache.org/docs/idl)
 
-Having studied these, and many other solutions, I have decided to ~~build my own Theme Park with...~~ create a system that will implement and complement the merits, 
+Having studied these, and many other solutions, I have decided to ~~build my own Theme Park with...~~ create **AdHoc protocol**: the system that will implement and complement the merits, 
 eliminating the discovered shortcomings.
 
 **AdHoc** protocol is a multilingual **C, C++, Rust, C#, Kotlin, Typescript...Scala/GO(upcoming)**, low-level binary protocol boilerplate code generator.
- According to your description file, **AdHoc** server generates source code, so you just have to insert your received packs handlers, and logic of creating a 
+ According to your protocol description file, **AdHoc** server generates source code, so you just have to insert your received packs handlers, and logic of creating a 
  new package, populating, with data and sending it to receiver.   
 **AdHoc** supports:
 - bitfields,
@@ -35,32 +35,32 @@ At the moment, the code generator AdHoc is built like **SaaS**. To get the gener
     ensure that `javac` (java compiler) is in PATH and accessible from the console.
 -   install any **JAVA** IDE (**[Intellij IDEA](https://www.jetbrains.com/idea/download/)** – just fine)
 -   download [AdHoс protocol annotations](https://github.com/cheblin/AdHoc-protocol/tree/master/org/unirail/AdHoc).
-    All AdHoc protocol description projects will need a reference to these
+    All **AdHoc protocol** description projects will need a reference to these
     annotations, precisely to the folder where the `org` - the annotations root
     folder is located. Since annotations are referenced as sources, in **IDEA**, you
     have to add them to the project in this way [Add Content
     Root](https://www.jetbrains.com/help/idea/content-roots.html).
 -   To send completed protocol description file to the server (to generate of
-    AdHoc protocol handler source code) and receive the result, you will need the
+    **AdHoc protoco**l handler source code) and receive the result, you will need the
     **[AdHocAgent](https://github.com/cheblin/AdHocAgent)** utility. Please download
     the [precompiled jar](https://github.com/cheblin/AdHocAgent/tree/master/bin)
     or compile the utility from provided source by yourself.
 
-As `DSL` AdHoc protocol use java language constructions, in fact protocol description file, is a plain java file. 
+As `DSL` **AdHoc protocol** use java language constructions, in fact protocol description file, is a plain java file. 
 So just create **JAVA** project in your favorite IDE and add reference to [AdHoc protocol annotations](https://github.com/cheblin/AdHoc-protocol/tree/master/src/org/unirail/AdHoc)  
 Create java file in your company namespace and import annotations with **import org.unirail.AdHoc.\*;**. 
 
 Regarding naming in your protocol specification. You cannot use names which start/end with `_` underscore. 
-Using programming keywords of any programming language that AdHoc protocol generator support are prohibited.
+Using programming keywords of any programming language that **AdHoc protocol** generator support are prohibited.
 **AdHocAgent** is checking used in protocol specification names before upload to server generator.
 
 In the java file, only **one** top-level class can be `public` and it name should be the same as file name. 
-In AdHoc protocol treat this name as the protocol project name.
+In **AdHoc protocol** treat this name as the protocol project name.
 
 # Network topology
 
-Most, similar AdHoc protocol, solutions are a concern only on information that nodes exchange.
-AdHoc protocol specification requires to describe full network topology: nodes, channels and packs.
+Most, similar **AdHoc protocol**, solutions are a concern only on information that nodes exchange.
+**AdHoc protocol** specification requires to describe full network topology: nodes, channels and packs.
 
 **None public** file top-level `class` denoted the host/node/device/unit that participate in information exchange. 
  
@@ -307,7 +307,7 @@ class ClientServerLink extends AdvProtocol //channel type
 
 # Channels
 
-To join nodes interfaces, AdHoc protocol has channels entities.  
+To join nodes interfaces, **AdHoc protocol** has channels entities.  
 Like nodes, they declare at the top-level of description file with java `class` construction and consist of three parts.
 Channel type after `extends` keywords and two connected interfaces after `implements`.
 ```java
@@ -339,7 +339,7 @@ If data are sending over secure transport or if AdHoc used as a serialization to
 
 # Enums
 
-To express enums (named constants set) AdHoc protocol use JAVA enum `static`, `final` fields.
+To express enums (named constants set) **AdHoc protocol** use JAVA enum `static`, `final` fields.
 Enums declare at the file top-level, next to nodes classes.
 
 ```java
@@ -408,7 +408,7 @@ Before read data from the `optional` field, we need to ensure that it contains a
 
 # Multidimensional fields
 
-AdHoc protocol generator recognizes multidimensional fields. They work exactly like a multidimensional array. 
+**AdHoc protocol** generator recognizes multidimensional fields. They work exactly like a multidimensional array. 
 Some dimensions can have a variable length. Exact length determined at field initialization.
 
 The following annotations are used to describe multidimensional fields
@@ -459,7 +459,7 @@ class Server implements InCS, InCPP, InC {
 
 # String fields
 
-Strings in AdHoc protocol on all languages are encoded in UTF-8 byte array. By default, without annotation, a string can allocate at most 256 bytes. 
+Strings in **AdHoc protocol** on all languages are encoded in UTF-8 byte array. By default, without annotation, a string can allocate at most 256 bytes. 
 This default length can be changed with array-item `@__( length )` annotation.
 All string fields are optional, it means it can be NULL ( does not contain any value).
 
