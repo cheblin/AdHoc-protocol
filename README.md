@@ -415,8 +415,8 @@ The following annotations are used to describe multidimensional fields
 | `@D( dims_params )`  | All space for field items is allocated in advance at field initialization.  Used in a case when the field is most likely to be completely filled with items.|
 | `@D_( dims_params )` | Space for items is allocated only when actually item inserted. Used for **sparse** arrays, when the array is most likely to be poorly filled. | 
 
-Dimensions lengths are pass as annotation parameters and  separated with `|` 
-Variable dimensions are denoted with the negative number which value is the maximum dimension length 
+Dimensions lengths are pass as annotation parameters and  separated with `|`  
+Variable dimensions are denoted with the negative number, which value is the maximum dimension length 
 
 ```java
 class Server implements InCS, InCPP, InC {
