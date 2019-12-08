@@ -48,9 +48,10 @@ At the moment, the code generator AdHoc is built like **SaaS**. To get the gener
 
 As `DSL` **AdHoc protocol** use java language constructions, in fact protocol description file, is a plain java file. 
 So just create **JAVA** project in your favorite IDE and add reference to [AdHoc protocol annotations](https://github.com/cheblin/AdHoc-protocol/tree/master/src/org/unirail/AdHoc)  
-Create java file in your company namespace and import annotations with **import org.unirail.AdHoc.\*;**. 
+Then, create java file in your company namespace and import annotations with **import org.unirail.AdHoc.\*;**. 
 
-Regarding naming in your protocol specification. You cannot use names which start/end with `_` underscore. 
+Regarding naming in your protocol specification. 
+You cannot use names which start/end with `_` underscore. 
 Using programming keywords of any programming language that **AdHoc protocol** generator support are prohibited.
 **AdHocAgent** is checking used in protocol specification names before upload to server generator.
 
@@ -121,8 +122,6 @@ class Client implements InKT, InTS, InRUST {
 ```
 Packet `class`, internal `static`, `final` fields **with primitive datatype**, AdHoc generator treat as packet constants.
 
-  
-
 For example a protocol description
 ```java
 package org.company.some_namespace;
@@ -187,7 +186,6 @@ The presence `onFirstPack` methods on the `Server`  `ClientServerLink` channel, 
 >  * `extends` of some other packet `class`, let to inherit fields from other packet
 
 Let see how is it works. Let change specification a bit
-
 
 
 ```java
@@ -350,7 +348,7 @@ import org.unirail.AdHoc.*;
 public class MyDemoProject {}
 
 enum LIMITS_STATE {
-	AQ_NAV_STATUS_INIT,
+	AQ_NAV_STATUS_INIT, //          assignable fields
 	AQ_NAV_STATUS_STANDBY,
 	AQ_NAV_STATUS_MANUAL,
 	AQ_NAV_STATUS_ALTHOLD,
@@ -390,7 +388,6 @@ Not initialized enum fields are automatically assigned integer values. If enum h
 If you need full control on enum fields type (*only integer types are supported) and values, use `static` `final` fields.  
 
 > **Please pay attention:** if enum has only static fields, its body cannot be empty, should have at least ; (semicolon)
-
 
 
 The pack fields annotations provide additional meta-information for the code generator.
@@ -461,7 +458,12 @@ class Server implements InCS, InCPP, InC {
 
 Strings in **AdHoc protocol** on all languages are encoded in UTF-8 byte array. By default, without annotation, a string can allocate at most 256 bytes. 
 This default length can be changed with array-item `@__( length )` annotation.
-All string fields are optional, it means it can be NULL ( does not contain any value).
+All string fields are optional, it means it can be NULL ( does not contain any value).  
+String field support only two annotations types:
+* `@__( bytes_length )`  - to set maximum string UTF8 encoded bytes
+* `D()` and `D_()`  - multidimensional string field   
+
+>other annotations are just silently ignored
 
 ### Using example
 
@@ -542,4 +544,43 @@ With `@B( from / to )` form let you set acceptable numbers range and code genera
 
 # Nested packets
 
-As enums can be any field datatype, any packet can become, field datatype. Packets enclosing can be as deep as it needed. Cycle enclosing is prohibited.
+As enums can be any field's data type, a packet can be, field's data type to. Packets enclosing can be as deep as it needed. Cycle enclosing is prohibited.
+
+```java
+package org.company.some_namespace;
+
+import org.unirail.AdHoc.*;
+
+public class MyDemoProject {}
+
+class Server implements InCS, InCPP, InC {
+	interface ToMyClients { // node interface
+		
+		class FirstPack {}
+	}
+}
+
+class Client implements InKT, InTS, InRUST {
+	interface ToServer { // Client communication interface
+		
+		class ServerParams {
+			@D(-5) Geo.Point position; //multidimensional field of Geo.Point items with one dimension up to 5 items
+			String name;
+			@A long id;
+		}
+	}
+	
+	interface Geo {
+		class Point {
+			float x;
+			float y;
+			float z;
+		}
+	}
+}
+
+class ClientServerLink extends AdvProtocol //channel type
+		implements
+		Client.ToServer, // connected interfaces
+				Server.ToMyClients {}
+```
