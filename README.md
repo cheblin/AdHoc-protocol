@@ -60,8 +60,8 @@ In **AdHoc protocol** treat this name as the protocol project name.
 
 # Network topology
 
-Most, similar **AdHoc protocol**, solutions are a concern only on information that nodes exchange.
-**AdHoc protocol** specification requires to describe full network topology: nodes, channels and packs.
+Most, similar **AdHoc protocol**, solutions are a concern only on information that nodes exchange.  
+**AdHoc protocol** specification provides facilities to describe full network topology: nodes, channels, and packs.
 
 **None public** file top-level `class` denoted the host/node/device/unit that participate in information exchange. 
  
