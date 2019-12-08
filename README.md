@@ -2,7 +2,7 @@ Manual writing of serialization and data deserialization code, especially betwee
 is a time- consuming process and error-prone. The most efficient solution is to create a DSL – by means of which formally describes the protocol, 
 and then create a utility that generates the source code based on this description for various target platforms, in the required programming languages.  
 
-Some examples of solutions build in this way:  
+Some examples of solutions built in this way:  
 [Protocol Buffers ](https://developers.google.com/protocol-buffers/docs/overview)  
 [Cap’n Proto ](https://capnproto.org/language.html)  
 [FlatBuffers ](http://google.github.io/flatbuffers/flatbuffers_guide_writing_schema.html)  
