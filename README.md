@@ -10,7 +10,7 @@ Some examples of solutions build in this way:
 [MAVLink ](https://github.com/mavlink/mavlink)  
 [Thrift](https://thrift.apache.org/docs/idl)
 
-Having studied these, and many other solutions, I have decided to create a system that will implement and complement the merits, 
+Having studied these, and many other solutions, I have decided to ~~build my own Theme Park with...~~ create a system that will implement and complement the merits, 
 eliminating the discovered shortcomings.
 
 **AdHoc** protocol is a multilingual **C, C++, Rust, C#, Kotlin, Typescript...Scala/GO(upcoming)**, low-level binary protocol boilerplate code generator.
