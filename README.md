@@ -61,7 +61,7 @@ In **AdHoc protocol** treat this name as the protocol project name.
 # Network topology
 
 Most, similar **AdHoc protocol**, solutions are a concern only on information that nodes exchange.  
-**AdHoc protocol** specification provides facilities to describe full network topology: nodes, channels, and packs.
+**AdHoc protocol** specification provides facilities to describe full network topology: nodes, channels, packs and there relationships.
 
 **None public** file top-level `class` denoted the host/node/device/unit that participate in information exchange. 
  
@@ -70,23 +70,29 @@ package org.company.some_namespace;// You project namespace. Required!
 
 import org.unirail.AdHoc.*;//        importing AdHoc protocol annotations 
 
-public class MyDemoProject {} //this public class name is AdHoc protocol project name
-
-class Server implements InCS, InCPP, InC { //for this host code will be generated in C#, C++ and C
-
-}
-
-class Client implements InKT, InTS, InRUST {
+public class MyDemoProject {//this class ( and file ) name, is the AdHoc protocol description project name
 	
-}
+	public static class Server implements InCS, InCPP, InC { //this host/node code will be generated in C#, C++ and C
+		
+	}
+	
+	public static class Client implements InKT, InTS, InRUST {
+		
+	}
+} 
 ```
-The `implements` java keyword denotes the list of the desired target programming languages for the particular host.
+The `implements` java keyword on host, denotes the list of the desired target programming languages for the particular host.
 
-Each participant can have _several_ interfaces thru which they exchange the information with others. Interfaces are expressed with java `interface` keyword.
+Each host can enclose _several_ communication interfaces through which it exchanges information with others.  
+Communication interfaces are expressed with java `interface` keyword.
+An interface has to be connected with others by Channels entity. Otherwise, it ignored.
 
-Every interface can contain multiple packs that host can **RECEIVE** and handle through this interface.
-Packs are, minimal transmitted information unit, and denoted with `class` java construction inside the interface. 
-> **Packets names should be unique!**  
+Every communication interface can contain multiple packs, that the host can **RECEIVE** and handle through this interface.   
+Packets declarations can be nested in each other.   
+Packs are, minimal transmitted information unit, and denoted with `class` java construction inside the interface or host.
+Packets declared in the host body, outside of any interfaces, if they are not referenced by other packets situated inside an interface, are ignored. 
+> **Packet's names should be unique! This rule is checked by AdHocAgent utility before upload description**  
+
  
 Pack `class` fields are a list of exact information it contains. 
 
@@ -95,83 +101,84 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {}
-
-class Server implements InCS, InCPP, InC {
-	interface ToMyClients {
-		class Login { //    host Server can receive Login packs through ToMyClients interface
-			@__(20) String login;// max 20 bytes array for UTF8 encoded login string
-			@__(12) byte   password;//maximum 12 bytes array for password hash
+public class MyDemoProject {
+	public static class Server implements InCS, InCPP, InC {
+		public interface ToMyClients {
+			class Login { //    host Server can receive Login packs through ToMyClients interface
+				@__(20) String login;// max 20 bytes array for UTF8 encoded login string
+				@__(12) byte   password;//maximum 12 bytes array for password hash
+			}
 		}
 	}
-}
-
-class Client implements InKT, InTS, InRUST {
-	interface ToServer {
-		class Position { //    host Client can receive Position packs through ToServer interface
-			@A long time_usec;//Timestamp (microseconds since system boot or since UNIX epoch)
-			float x;//X Position
-			float y;//Y Position
-			float z;//Z Position
-			
-			final int  int_constant  = 34; //pack constants
-			final byte byte_constant = 2;
+	
+	static class Client implements InKT, InTS, InRUST {
+		public interface ToServer {
+			public class Position { //    host Client can receive Position packs through ToServer interface
+				@A long time_usec;//Timestamp (microseconds since system boot or since UNIX epoch)
+				float x;//X Position
+				float y;//Y Position
+				float z;//Z Position
+				
+				final int  int_constant  = 34; //pack constants
+				final byte byte_constant = 2;
+			}
 		}
 	}
 }
 ```
-Packet `class`, internal `static`, `final` fields **with primitive datatype**, AdHoc generator treat as packet constants.
+Here, the `Server` host declare, it can **receive** `Login` packet on it's `ToMyClients` interface. 
+Every counterpart connected to this interface will get code to create, populate with data, and send the `Login` packet to `Server`.
+And the `Client` host declares the capability to receive `Position` packet on its `ToServer` interface.
 
-For example a protocol description
+Packet `class`, internal `static`, `final` fields, **with primitive datatype** (`int_constant`, `byte_constant` ), AdHoc generator treat as `Position` packet constants.
+
+An other protocol description example:
 ```java
 package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {}
-
-class Server implements InCS, InCPP, InC {
-	interface ToMyClients { // node interface
-		class FirstPack {}
-	}
-	
-	interface IWoker {
-		class Job {}// Job Packet
-	}
-	
-	interface ILogger {
+public class MyDemoProject {
+	public static class Server implements InCS, InCPP, InC {
+		interface ToMyClients { // node interface
+			class FirstPack {}
+		}
 		
-		class Log {}
+		interface IWoker {
+			class Job {}// Job Packet
+		}
+		
+		interface ILogger {
+			class Log {}
+		}
+		
+		interface IDispatcher {
+			class Dispatch {}
+		}
+		
+		interface CommonPacks {
+			class Pack1 {}
+			
+			class Pack2 {}
+			
+			class Pack3 {}
+		}
 	}
 	
-	interface IDispatcher {
-		class Dispatch {}
+	public static class Client implements InKT, InTS, InRUST {
+		interface ToServer { // Client communication interface
+			
+			class ServerParams {}
+		}
 	}
 	
-	interface CommonPacks {
-		class Pack1 {}
-		
-		class Pack2 {}
-		
-		class Pack3 {}
-	}
+	public static class ClientServerLink extends AdvProtocol //channel type
+			implements
+			Client.ToServer, // connected interfaces
+					Server.ToMyClients {}
 }
-
-class Client implements InKT, InTS, InRUST {
-	interface ToServer { // Client communication interface
-		
-		class ServerParams {}
-	}
-}
-
-class ClientServerLink extends AdvProtocol //channel type
-		implements
-		Client.ToServer, // connected interfaces
-				Server.ToMyClients {}
-
 ```
 On receiving this description, the server generates the following API. (Some minor elements are skipped.)
-
 
 ![image](https://user-images.githubusercontent.com/29354319/70285706-6c599480-1803-11ea-9e0a-d0e4ddd07c9e.png)
 
@@ -180,10 +187,11 @@ On receiving this description, the server generates the following API. (Some min
 It becomes apparent that channel not-connected interfaces are ignored.
 The presence `onFirstPack` methods on the `Server`  `ClientServerLink` channel, let Server receive `FirstPack` packet and `sendServerParams` method let it send `ServerParams` pack.
 
-> * **on nodes communications `interfaces`**:  java keyword `extends`  let "inherit" packs declarations from other interfaces. 
-> * **after packet `class`** declaration, the keyword : 
->  * `implements` of communication interfaces, let this packet be embedded into "implemented" interfaces. 
->  * `extends` of some other packet `class`, let to inherit fields from other packet
+> * **on nodes communication `interfaces`**: using java keyword `extends`  let "inherit" packs declarations from other interfaces. 
+> * **on packet `class`** declaration, the keyword  `extends` of some other packet `class`, let to inherit fields from other packet.  
+>If the body of the packet `class`, which `extends`, remind empty, if the packet name is :
+>  * the same as packet it extends: this not create a new pack, it's just copy extended pack declaration in place. 
+>  * is different, then packet it extends: this creates packet alias, the new packet, with a new ID, with copy of all fields from the packet it extends. 
 
 Let see how is it works. Let change specification a bit
 
@@ -193,56 +201,56 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {}
-
-class Server implements InCS, InCPP, InC {
-	interface ToMyClients extends CommonPacks { // ToMyClients interface inherit all packs from CommonPacks
-		class FirstPack {}
-	}
+public class MyDemoProject {
 	
-	interface IWoker {
-		class Job implements ToMyClients {}  // Job Packet will be inserted in to ToMyClients interface
-	}
-	
-	interface ILogger {
+	public static class Server implements InCS, InCPP, InC {
+		public interface ToMyClients extends CommonPacks { // ToMyClients interface inherit all packs from CommonPacks
+			class FirstPack {}
+		}
 		
-		class Log {}
+		public interface IWoker {
+			class Job {}
+		}
+		
+		public interface ILogger {
+			
+			class Log {}
+		}
+		
+		public interface IDispatcher {
+			class Dispatch {}
+		}
+		
+		public interface CommonPacks {
+			class Pack1 {}
+			
+			class Pack2 {}
+			
+			class Pack3 {}
+		}
 	}
 	
-	interface IDispatcher {
-		class Dispatch {}
+	public static class Client implements InKT, InTS, InRUST {
+		interface ToServer extends Server.CommonPacks { // getting all packs from Server.CommonPacks
+			class ServerParams {}
+			
+			class Job extends Server.IWoker.Job {} // Job Packet will be inserted in to ToMyClients interface
+		}
 	}
 	
-	interface CommonPacks {
-		class Pack1 {}
-		
-		class Pack2 {}
-		
-		class Pack3 {}
-	}
+	public static class ClientServerLink extends AdvProtocol //channel type
+			implements
+			Client.ToServer, // connected interfaces
+					Server.ToMyClients {}
 }
-
-class Client implements InKT, InTS, InRUST {
-	interface ToServer extends Server.CommonPacks { // Client communication interface
-		
-		class ServerParams {}
-	}
-}
-
-class ClientServerLink extends AdvProtocol //channel type
-		implements
-		Client.ToServer, // connected interfaces
-				Server.ToMyClients {}
 ```
-
-
 
 ![image](https://user-images.githubusercontent.com/29354319/70288179-1b01d300-180c-11ea-8e09-d679f7f9af6e.png)
 
 All packs: `Pack1`, `Pack2`, `Pack3` from  `CommonPacks` interface now embedded into  `Server.ToMyClients` and `Client.ToServer` interfaces.   
 So `Server` and `Client` can send and receive them.
 
-In additional, packet `Job` from `IWoker` interface jumps into `Server.ToMyClients` interface, and become `FirstPack` neighbor.
+In additional, packet `Job` from `Server.IWoker` interface jumps with the same name into `Client.ToServer` interface, and become `ServerParams` pack neighbor.
 
 If we take a look at our protocol description now it's changed by the server.
 ```java
@@ -337,8 +345,8 @@ If data are sending over secure transport or if AdHoc used as a serialization to
 
 # Enums
 
-To express enums (named constants set) **AdHoc protocol** use JAVA enum `static`, `final` fields.
-Enums declare at the file top-level, next to nodes classes.
+To express enums (named constants set) **AdHoc protocol** use JAVA enum.
+Enums can be declared anywhere even can be nested inside packets declaration.
 
 ```java
 package org.company.some_namespace;
@@ -382,25 +390,24 @@ class Client implements InKT, InTS, InRUST {
 	}
 }
 ```
-`@Flags` annotations denote special Flag Bits enum.
 
-Not initialized enum fields are automatically assigned integer values. If enum has `@Flags` annotation, generated value respectively: is bit flags like.
-If you need full control on enum fields type (*only integer types are supported) and values, use `static` `final` fields.  
+`@Flags` annotations denote special **Flag Bits enum**.
 
-> **Please pay attention:** if enum has only static fields, its body cannot be empty, should have at least ; (semicolon)
+Not initialized enum fields are automatically assigned integer values. If enum has `@Flags` annotation, generated value, respectively, is **bit flags** like.
+If you need more control on enum fields type (*only integer types are supported) and values, use `enum` `static` `final` fields.  
 
+> **Please pay attention:**  enum body cannot be empty, should have at least `;` (semicolon), if you declare only `static` `final` fields. 
 
-The pack fields annotations provide additional meta-information for the code generator.
 
 # `Optional` and `required` fields
 
-Any field in **AdHoc** protocol can be `required` or `optional`. 
-Without the special annotation, all fields with primitive datatype are `required`   
-`required` field allocates space in the transmitted packet even if it was not filled with data.  
-in its turn empty `optional` field allocates in packet just a few bits.  
- Fields with String and nested packet datatype are optional.
+Any field in **AdHoc** protocol can be `optional` or `required` . 
+Without any annotation, all primitive datatype fields are `required`.   
+This field type allocates space, in the transmitted packet, even if it was not filled with any data.  
+in turn, skipped `optional` field allocates in packet just a few bits.  
+Fields with String and nested packet datatype are optional.
 Any field with primitive or array-item datatype can be made `optional` with a special form of annotation that ends with _ (underscore) `@A_, @V_, @X_, @I_`  
-Before read data from the `optional` field, we need to ensure that it contains any data. 
+Before read data from the `optional` field, it needs to ensure, that it contains any data. 
 
 
 # Multidimensional fields
@@ -416,7 +423,7 @@ The following annotations are used to describe multidimensional fields
 | `@D_( dims_params )` | Space for items is allocated only when actually item inserted. Used for **sparse** arrays, when the array is most likely to be poorly filled. | 
 
 Dimensions lengths are pass as annotation parameters and  separated with `|`  
-Variable dimensions are denoted with the negative number, which value is the maximum dimension length 
+`Variable dimensions` are denoted with the negative number, which value is the maximum dimension length 
 
 ```java
 class Server implements InCS, InCPP, InC {
