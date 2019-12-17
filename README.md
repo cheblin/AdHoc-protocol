@@ -93,6 +93,10 @@ Packs are, minimal transmitted information unit, and denoted with `class` java c
 Packets declared in the host body, outside of any interfaces, if they are not referenced by other packets situated inside an interface, are ignored. 
 > **Packet's names should be unique! This rule is checked by AdHocAgent utility before upload description**  
 
+Every packet should have project scope unique `id` annotation. 
+Located in project file packs without `id` annotation, can acquire the `id` automatically from the server on description processing. 
+But all packs in imported protocol descriptions should have predefined whole project scope unique `id`.
+
  
 Pack `class` fields are a list of exact information it contains. 
 
@@ -314,8 +318,8 @@ class ClientServerLink extends AdvProtocol //channel type
 # Channels
 
 To join nodes interfaces, **AdHoc protocol** has channels entities.  
-Like nodes, they declare at the top-level of description file with java `class` construction and consist of three parts.
-Channel type after `extends` keywords and two connected interfaces after `implements`.
+Like nodes, they declare at the top-level of description file with java **NONE PUBLIC** `class` construction and consist of three parts.
+Channel type, after `extends` keyword, and two connected interfaces after `implements`. Its `class` has an empty body.
 ```java
 package org.company.some_namespace;
 
@@ -398,6 +402,17 @@ If you need more control on enum fields type (*only integer types are supported)
 
 > **Please pay attention:**  enum body cannot be empty, should have at least `;` (semicolon), if you declare only `static` `final` fields. 
 
+# Importing descriptions
+Java `import` statement at the beginning of the file before any type definitions but after the package statement, let use interfaces and packages definitions from 
+other protocol description files.
+Importing definitions should be in full form without the asterisk (*) wildcard character.
+```java
+import com.company.ProtocolProject;
+import com.other_company.OtherProtocolProject;
+```
+Locations of the importing source files should be provided with `sourcepath` option. 
+>**All imported packs should have valid predefined project scope unique `id`.** 
+ 
 
 # `Optional` and `required` fields
 
