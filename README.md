@@ -501,33 +501,58 @@ class Server implements InCS, InCPP, InC {
 ```
  
 
-# Numeric fields value changing dispersion
+# Numeric fields
 
-The packet numeric fields can be annotated with `@A, @V, @X, @I` This annotations are denoting the
-meta-information about the pattern of the field value changing. Based on this
-information, code generator can skip or apply [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding)  compression
+AdHoc provide powerful numeric fields annotations that help to provide to the code generator useful information in advance.
+
+ >**Any field with numeric data type with an annotation which name ends with `_` make this field `optional`**
+
+If the numeric field has random values, uniformly distributed in full it's numeric type range, as noise.
+
+![image](https://user-images.githubusercontent.com/29354319/70127303-bdf40900-16b5-11ea-94c9-c0dcd045500f.png)
+
+The compression or encoding of this data type is wasting computation resources. 
+In **AdHoc** this is pack's `required` fields with **just** java numeric types and their data treated as is.
+
+![image](https://user-images.githubusercontent.com/29354319/71319106-a3eb6080-24d4-11ea-9f51-10f60e4e0057.png)
+
+Adding `@I_(0)` annotation make this field `optional`.
+
+Annotation `@I`, **without parameters**, make field unsigned, in a full numeric type range.
+ 
+![image](https://user-images.githubusercontent.com/29354319/71319085-40f9c980-24d4-11ea-94ba-4e10783a3cc2.png)
+
+Annotation `@I_` **without parameters**, make field unsigned and `optional`, applied on a `float` or `double` numeric type make field only `optional`
+
+If a numeric field has `@I` or `@I_` annotation, with a data range parameter, the exact future field data type is calculated by the code generator.
+```java
+    @I( 0/255 ) long field;       //will generate    uint8_t field;  in C
+    @I( -2_000/551 ) byte field2; //will generate    int16_t field2; in C
+```
+As `/`,  `|` can be used as range delimiter.
+
+--------------
+If numeric fields have some dispersion/gradient pattern in its value changing...
+
+![image](https://user-images.githubusercontent.com/29354319/70128574-0a404880-16b8-11ea-8a4d-efa8a7358dc1.png)
+
+It is possible to leverage this knowledge to minimize the amount of data transmission.
+As protocol creator, you know your numbers better than any generator, and annotations are the means by which you share your knowledge with the generator.
+Based on this information, code generator can skip or use [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding)  compression
 algorithm, which allows good and with small resource load, reduces the sending data amount. 
-This is achieved by skipping transmission of the higher, if they are zeros, bytes and then restoring them on the receiving side.
+This is achieved by skipping from the transmission of the higher if they are zeros, bytes and then restoring them on the receiving side.
 
 This graph shows the dependence of sending bytes on transferred value.
 
 ![image](https://user-images.githubusercontent.com/29354319/70126207-84ba9980-16b3-11ea-9900-48251b545eef.png)
 
-It is became clear that with `Base 128 Varint encoding`, smaller value require less bytes to transfer.
-As protocol creator, you know your numbers better than any generator, and annotations are the means by which you share your knowledge with the generator.
+It is becoming clear that `Base 128 Varint encoding`, with smaller value requires fewer bytes to transfer. 
+The packet numeric fields can be annotated with `@A, @V, @X, @I` This annotations are denoting the
+meta-information about the pattern of the field value changing. 
 
-For example, if numeric field have random values, uniformly distributed in full range. Almost as noise.
 
-![image](https://user-images.githubusercontent.com/29354319/70127303-bdf40900-16b5-11ea-94c9-c0dcd045500f.png)
 
-The compression or encoding of this type of data is wasting computation resources. This kind of data is better to transmit as-is.
-This type numeric fields should not have any annotation or have `@I` if needed.
-
-Otherwise, if numeric fields have some dispersion/gradient pattern in its value changing...
-
-![image](https://user-images.githubusercontent.com/29354319/70128574-0a404880-16b8-11ea-8a4d-efa8a7358dc1.png)
-
-It is possible to leverage this knowledge to minimize the amount of data transmission.
+Otherwise, 
 
 #### Let highlight three basic types of numeric value changing patterns. 
 
