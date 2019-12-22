@@ -523,8 +523,9 @@ Annotation `@I`, **without parameters**, make field unsigned and `reqiered`. Wit
  
 ![image](https://user-images.githubusercontent.com/29354319/71323528-47596700-250f-11ea-91fc-ca99bb971a8c.png)
 
-Annotation `@I_` **without parameters**, make field unsigned and `optional`,   
-Annotation `@I_` **without parameters** on field with a `float` or `double` datatype make the field `optional`
+Annotation `@I_` **without parameters**, make field with:
+ * integer datatype - unsigned and `optional`,   
+ * with a `float` or `double` datatype - `optional`
 
 If some value changes in, for example, range from `200 005` to `200 078`, it could be better internally to allocate to store it just one-byte with `200 005` constant as offsets.
 And provide external, getter/setter functions, that transform value from external to the internal representation and vice versa. 
