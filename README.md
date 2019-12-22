@@ -503,9 +503,10 @@ class Server implements InCS, InCPP, InC {
 
 # Numeric fields
 
-AdHoc provide powerful numeric fields annotations that help to provide to the code generator useful information in advance.
+As a protocol creator, you know your digits better than any code generator. **AdHoc** provides annotations - the means to share your knowledge with the generator.
+That knowledge helps the code generator generate optimal code.
 
- >**Any field with numeric data type with an annotation which name ends with `_` make this field `optional`**
+ >**Annotation which name ends with `_` make field `optional`**
 
 If the numeric field has random values, uniformly distributed in full it's numeric type range, as noise.
 
@@ -516,20 +517,30 @@ In **AdHoc** this is pack's `required` fields with **just** java numeric types a
 
 ![image](https://user-images.githubusercontent.com/29354319/71319106-a3eb6080-24d4-11ea-9f51-10f60e4e0057.png)
 
-Adding `@I_(0)` annotation make this field `optional`.
+Special `@I_(0)` annotation make signed field `optional`.
 
-Annotation `@I`, **without parameters**, make field unsigned, in a full numeric type range.
+Annotation `@I`, **without parameters**, make field unsigned and `reqiered`. With full assigned integer datatype range.
  
 ![image](https://user-images.githubusercontent.com/29354319/71319085-40f9c980-24d4-11ea-94ba-4e10783a3cc2.png)
 
-Annotation `@I_` **without parameters**, make field unsigned and `optional`, applied on a `float` or `double` numeric type make field only `optional`
+Annotation `@I_` **without parameters**, make field unsigned and `optional`, 
+Annotation `@I_` **without parameters** on field with a `float` or `double` datatype make the field `optional`
 
-If a numeric field has `@I` or `@I_` annotation, with a data range parameter, the exact future field data type is calculated by the code generator.
+If some value changes in, for example, range from `200 005` to `200 078`, it could be better internally to allocate to store it just one-byte with `200 005` constant as offsets.
+And provide external, getter/setter functions, that transform value from external to the internal representation and vice versa. 
+
+`@I` and `@I_` annotations can accept these kind parameters in the different forms.
+* a single integer value that is shifting the middle of the range of field assigned integer datatype
 ```java
-    @I( 0/255 ) long field;       //will generate    uint8_t field;  in C
-    @I( -2_000/551 ) byte field2; //will generate    int16_t field2; in C
+     @I_( 31 ) byte field;       //will generate optional field with acceptable values in the range from -96 to 158 with int16_t as external and uint8_t as internal datatype  
+ ```
+ * range - two integer with `/` or `|` as delimiter. The optimal field's external and internal data type will be calculated by the code generator. Field datatype is ignored
+```java
+    @I( 0/255 ) long field;            //will generate required field with uint8_t as external and internal datatype
+    @I( -2_000 | -1_900 ) short field2; //will generate required field with int16_t as external, uint8_t as internal datatype and -2_000 as shift constant.
 ```
-As `/`,  `|` can be used as range delimiter.
+
+
 
 --------------
 If numeric fields have some dispersion/gradient pattern in its value changing...
@@ -537,7 +548,7 @@ If numeric fields have some dispersion/gradient pattern in its value changing...
 ![image](https://user-images.githubusercontent.com/29354319/70128574-0a404880-16b8-11ea-8a4d-efa8a7358dc1.png)
 
 It is possible to leverage this knowledge to minimize the amount of data transmission.
-As protocol creator, you know your numbers better than any generator, and annotations are the means by which you share your knowledge with the generator.
+
 Based on this information, code generator can skip or use [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding)  compression
 algorithm, which allows good and with small resource load, reduces the sending data amount. 
 This is achieved by skipping from the transmission of the higher if they are zeros, bytes and then restoring them on the receiving side.
