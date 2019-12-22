@@ -416,13 +416,16 @@ Locations of the importing source files should be provided with `sourcepath` opt
 
 # `Optional` and `required` fields
 
-Any field in **AdHoc** protocol can be `optional` or `required` . 
-Without any annotation, all primitive datatype fields are `required`.   
-This field type allocates space, in the transmitted packet, even if it was not filled with any data.  
-in turn, skipped `optional` field allocates in packet just a few bits.  
-Fields with String and nested packet datatype are optional.
-Any field with primitive or array-item datatype can be made `optional` with a special form of annotation that ends with _ (underscore) `@A_, @V_, @X_, @I_`  
-Before read data from the `optional` field, it needs to ensure, that it contains any data. 
+A pack's field can be `optional` or `required`.
+ * `required` fields are always allocated and transmitted, even if it was not touched and filled with data.
+ * `optional` fields, in turns, if it was not touched, allocates just a few mark bits
+
+
+Fields with primitive datatype: 
+ * without any annotation are `required`.
+ * with annotation which name ends with `_`, (`@A_, @V_, @X_, @I_`) are `optional`
+  
+Fields with `String`, `dynamic array` and `other packet` data types are always `optional`.
 
 
 # Multidimensional fields
@@ -444,7 +447,7 @@ Dimensions lengths are pass as annotation parameters and  separated with `|`
 class Server implements InCS, InCPP, InC {
 	interface ToMyClients {
 		class Pack {
-			@D_(1 | 2 | 7) short dim_field;// field of shorts with 1 x 2 x 7 dimensions 
+			@D_(1 | 2 | 7) short dim_field;// optional field of shorts with 1 x 2 x 7 dimensions 
 			@D(2 | -7) int var_dim_field;//the last dimension has variable, up to 7 length 
 		}
 	}
@@ -487,8 +490,6 @@ String field support only two annotations types:
 
 >other annotations are just silently ignored
 
-### Using example
-
 ```java
 class Server implements InCS, InCPP, InC {
 	interface ToMyClients {
@@ -506,32 +507,30 @@ class Server implements InCS, InCPP, InC {
 As a protocol creator, you know your digits better than any code generator. **AdHoc** provides annotations - the means to share your knowledge with the generator.
 That knowledge helps the code generator generate optimal code.
 
- >**Annotation which name ends with `_` make field `optional`**
-
 If the numeric field has random values, uniformly distributed in full it's numeric type range, as noise.
 
 ![image](https://user-images.githubusercontent.com/29354319/70127303-bdf40900-16b5-11ea-94c9-c0dcd045500f.png)
 
-The compression or encoding of this data type is wasting computation resources. 
-In **AdHoc** the pack's fields with **only** java numeric types are `required` and their data treated as is.
+The compression or encoding of this data type is wasting computation resources.  
+For this case exists fields with **only** java numeric datatype. Without annotation the field is signed, `required`and their data treated as normal java number.
 
 ![image](https://user-images.githubusercontent.com/29354319/71319106-a3eb6080-24d4-11ea-9f51-10f60e4e0057.png)
 
-Special `@I_(0)` annotation make signed field `optional`.
+Special `@I_(0)` annotation make signed field - `optional`.
 
 Annotation `@I`, **without parameters**, make field unsigned and `reqiered`. With full assigned integer datatype range.
  
-![image](https://user-images.githubusercontent.com/29354319/71323528-47596700-250f-11ea-91fc-ca99bb971a8c.png)
+![image](https://user-images.githubusercontent.com/29354319/71323707-301b7900-2511-11ea-954c-69aab2a70509.png)
 
 Annotation `@I_` **without parameters**, make field with:
  * integer datatype - unsigned and `optional`,   
  * with a `float` or `double` datatype - `optional`
 
-If some value changes in, for example, range from `200 005` to `200 078`, it could be better internally to allocate to store it just one-byte with `200 005` constant as offsets.
+If some value changes in, for example, range from `200 005` to `200 078`, it could be better, internally, to allocate, to store it, just one-byte with `200 005` constant as offsets.
 And provide external, getter/setter functions, that transform value from external to the internal representation and vice versa. 
 
 `@I` and `@I_` annotations can accept these kind parameters in the different forms.
-* a single integer value that is shifting the middle of the range of field assigned integer datatype
+* a single integer value: it's shifting the middle of the range of field assigned integer datatype
 ```java
      @I_( 31 ) byte field;       //will generate optional field with acceptable values in the range from -96 to 158 with int16_t as external and uint8_t as internal datatype  
  ```
@@ -565,7 +564,7 @@ Let highlight three basic types of numeric value changing patterns.
 ![image](https://user-images.githubusercontent.com/29354319/70131118-bbe17880-16bc-11ea-84a2-2a2a4106a810.png)|Fluctuations are possible only in the direction of smaller values relative to most probable value `val`.These numeric field is annotated with  `@V(val)`
 
 
-The most probable value  – **val** is passed as annotation argument. This value can be a number @V(-11 ) or it can be pass as range: two number separated by `/` @A(-11 / 75)
+The most probable value  – **val** is passed as annotation argument. This value can be a single number @V(-11 ) or it can be pass as range: two number separated by `/` @A(-11 / 75)
 
  `@A, @V, @X, @I` annotations with _ `@A_, @V_, @X_, @I_` make numeric field `optional` 
 
