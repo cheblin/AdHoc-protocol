@@ -513,7 +513,7 @@ If the numeric field has random values, uniformly distributed in full it's numer
 ![image](https://user-images.githubusercontent.com/29354319/70127303-bdf40900-16b5-11ea-94c9-c0dcd045500f.png)
 
 The compression or encoding of this data type is wasting computation resources. 
-In **AdHoc** this is pack's `required` fields with **just** java numeric types and their data treated as is.
+In **AdHoc** the pack's fields with **only** java numeric types are `required` and their data treated as is.
 
 ![image](https://user-images.githubusercontent.com/29354319/71319106-a3eb6080-24d4-11ea-9f51-10f60e4e0057.png)
 
@@ -521,7 +521,7 @@ Special `@I_(0)` annotation make signed field `optional`.
 
 Annotation `@I`, **without parameters**, make field unsigned and `reqiered`. With full assigned integer datatype range.
  
-![image](https://user-images.githubusercontent.com/29354319/71319085-40f9c980-24d4-11ea-94ba-4e10783a3cc2.png)
+![image](https://user-images.githubusercontent.com/29354319/71323528-47596700-250f-11ea-91fc-ca99bb971a8c.png)
 
 Annotation `@I_` **without parameters**, make field unsigned and `optional`,   
 Annotation `@I_` **without parameters** on field with a `float` or `double` datatype make the field `optional`
