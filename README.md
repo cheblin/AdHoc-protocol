@@ -523,7 +523,7 @@ Annotation `@I`, **without parameters**, make field unsigned and `reqiered`. Wit
  
 ![image](https://user-images.githubusercontent.com/29354319/71319085-40f9c980-24d4-11ea-94ba-4e10783a3cc2.png)
 
-Annotation `@I_` **without parameters**, make field unsigned and `optional`, 
+Annotation `@I_` **without parameters**, make field unsigned and `optional`,   
 Annotation `@I_` **without parameters** on field with a `float` or `double` datatype make the field `optional`
 
 If some value changes in, for example, range from `200 005` to `200 078`, it could be better internally to allocate to store it just one-byte with `200 005` constant as offsets.
@@ -539,17 +539,13 @@ And provide external, getter/setter functions, that transform value from externa
     @I( 0/255 ) long field;            //will generate required field with uint8_t as external and internal datatype
     @I( -2_000 | -1_900 ) short field2; //will generate required field with int16_t as external, uint8_t as internal datatype and -2_000 as shift constant.
 ```
-
-
-
 --------------
 If numeric fields have some dispersion/gradient pattern in its value changing...
 
 ![image](https://user-images.githubusercontent.com/29354319/70128574-0a404880-16b8-11ea-8a4d-efa8a7358dc1.png)
 
-It is possible to leverage this knowledge to minimize the amount of data transmission.
-
-Based on this information, code generator can skip or use [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding)  compression
+It is possible to leverage this knowledge to minimize the amount of data transmission.  
+In this case code generator can use [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding) compression
 algorithm, which allows good and with small resource load, reduces the sending data amount. 
 This is achieved by skipping from the transmission of the higher if they are zeros, bytes and then restoring them on the receiving side.
 
@@ -557,15 +553,9 @@ This graph shows the dependence of sending bytes on transferred value.
 
 ![image](https://user-images.githubusercontent.com/29354319/70126207-84ba9980-16b3-11ea-9900-48251b545eef.png)
 
-It is becoming clear that `Base 128 Varint encoding`, with smaller value requires fewer bytes to transfer. 
-The packet numeric fields can be annotated with `@A, @V, @X, @I` This annotations are denoting the
-meta-information about the pattern of the field value changing. 
+It is becoming clear that with `Base 128 Varint encoding`, smaller value requires fewer bytes to transfer. 
 
-
-
-Otherwise, 
-
-#### Let highlight three basic types of numeric value changing patterns. 
+Let highlight three basic types of numeric value changing patterns. 
 
 |.....................pattern...............................|  description 
 :-------------------------:|:-------------------------
@@ -574,7 +564,7 @@ Otherwise,
 ![image](https://user-images.githubusercontent.com/29354319/70131118-bbe17880-16bc-11ea-84a2-2a2a4106a810.png)|Fluctuations are possible only in the direction of smaller values relative to most probable value `val`.These numeric field is annotated with  `@V(val)`
 
 
-The most probable value  – **val** is passed as annotation argument. this value can be a number @V(-11 ) or it can be pass as range: two number separated by `/` @A(-11 / 75)
+The most probable value  – **val** is passed as annotation argument. This value can be a number @V(-11 ) or it can be pass as range: two number separated by `/` @A(-11 / 75)
 
  `@A, @V, @X, @I` annotations with _ `@A_, @V_, @X_, @I_` make numeric field `optional` 
 
@@ -583,7 +573,7 @@ The most probable value  – **val** is passed as annotation argument. this v
 class Server implements InCS, InCPP, InC {
 	interface ToMyClients {
 		class Pack {
-			@I           byte  field;    //required field, the field data before sending is not encoded (poorly compressible), and can take values in the range from -128 to 127                      
+			             byte  field;    //required field, the field data before sending is not encoded (poorly compressible), and can take values in the range from -128 to 127                      
 			@A           byte  field1;   //required field, the data is compressed, the field can take values in the range from 0 to 255. In fact it is an analogy to the type uint8_t in C. 
 			@I(-1000)    byte  field2;   //required field, (not to be compressed), the field can take values in the range from -1128 to -873                                                          
 			@X_          short field3;   //optional field takes values in the range  from -32 768 to 32 767. will be compressed with ZigZag on sending.                                       
