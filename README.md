@@ -18,24 +18,28 @@ eliminating the discovered shortcomings.
  new package, populating, with data and sending it to receiver.   
 **AdHoc** supports:
 - bitfields,
-- standard set primitive datatype, 
+- standard set primitive datatypes and more 
 - UTF8 strings using everywhere
-- optional fields
-- variations of multidimensional fields with predefined and variable dimensions
-- nested packs,
+- `optional` and `requiered` fields
+- multidimensional fields with predefined and variable dimensions
+- nested packs, enums
 - ordinary and flagbits like enums 
-- pack constants
-- pack fields inheritance 
-- generate code adapter to simplify fast exchange data between user objects and  protocol packs 
+- fields with other pack datatype
+- fields with enum datatype
+- packet level constants
+- pack's fields inheritance 
+- host's communication interfaces inheritance 
+- importing packs and communication interfaces from other protocol descriptions 
+- embedded code adapter to simplify fast exchange data between user objects and  protocol packs 
 - [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding) compression.
 
-At the moment, the code generator AdHoc is built like **SaaS**. To get the generated and tested code it is necessary:
+At the moment, the code generator AdHoc is built like **SaaS**. To get the generated (and tested) code, it is necessary:
 
 -   install **[JDK 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)** please
     ensure that `javac` (java compiler) is in PATH and accessible from the console.
 -   install any **JAVA** IDE (**[Intellij IDEA](https://www.jetbrains.com/idea/download/)** – just fine)
 -   download [AdHoс protocol annotations](https://github.com/cheblin/AdHoc-protocol/tree/master/org/unirail/AdHoc).
-    All **AdHoc protocol** description projects will need a reference to these
+    **AdHoc protocol** description projects will need a reference to these
     annotations, precisely to the folder where the `org` - the annotations root
     folder is located. Since annotations are referenced as sources, in **IDEA**, you
     have to add them to the project in this way [Add Content
@@ -53,6 +57,7 @@ Then, create java file in your company namespace and import annotations with **i
 Regarding naming in your protocol specification. 
 You cannot use names which start/end with `_` underscore. 
 Using programming keywords of any programming language that **AdHoc protocol** generator support are prohibited.
+
 **AdHocAgent** is checking used in protocol specification names before upload to server generator.
 
 In the java file, only **one** top-level class can be `public` and it name should be the same as file name. 
@@ -516,7 +521,7 @@ For this case exists fields with **only** java numeric datatype. Without annotat
 
 ![image](https://user-images.githubusercontent.com/29354319/71319106-a3eb6080-24d4-11ea-9f51-10f60e4e0057.png)
 
-Special `@I_(0)` annotation make signed field - `optional`.
+Special form `@I_()` annotation, make this field type - `optional`.
 
 Annotation `@I`, **without parameters**, make field unsigned and `reqiered`. With full assigned integer datatype range.
  
