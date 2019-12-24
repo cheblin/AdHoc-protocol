@@ -30,7 +30,7 @@ eliminating the discovered shortcomings.
 - pack's fields inheritance 
 - host's communication interfaces inheritance 
 - importing packs and communication interfaces from other protocol descriptions 
-- embedded code adapter to simplify fast exchange data between user objects and  protocol packs 
+- embedded code adapter to simplify fast exchange data between user data objects and **AdHoc** protocol packs 
 - [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding) compression.
 
 At the moment, the code generator AdHoc is built like **SaaS**. To get the generated (and tested) code, it is necessary:
