@@ -422,8 +422,8 @@ Locations of the importing source files should be provided with `sourcepath` opt
 # `Optional` and `required` fields
 
 A pack's field can be `optional` or `required`.
- * `required` fields are always allocated and transmitted, even if it was not touched and filled with data.
- * `optional` fields, in turns, if it was not touched, allocates just a few mark bits
+ * `required` fields are always allocated and transmitted, even if was not touched and filled with data.
+ * `optional` fields, in turns, if was not touched, allocates just a few mark bits
 
 
 Fields with primitive datatype: 
@@ -435,25 +435,34 @@ Fields with `String`, `dynamic array` and `other packet` data types are always `
 
 # Multidimensional fields
 
-**AdHoc protocol** generator recognizes multidimensional fields. They work exactly like a multidimensional array. 
-Some dimensions can have a variable length. Exact length determined at field initialization.
+In AdHoc packet's field can be multidimensional. They are similar to the multidimensional array with constant and variable dimensions length. 
+The exact variable dimensions length is set at field initialization.
 
-The following annotations are used to describe multidimensional fields
+The following annotations are used to describe multidimensional fields parameters:
 
 |........................................  |  |
 |-----|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `@D( dims_params )`  | All space for field items is allocated in advance at field initialization.  Used in a case when the field is most likely to be completely filled with items.|
-| `@D_( dims_params )` | Space for items is allocated only when actually item inserted. Used for **sparse** arrays, when the array is most likely to be poorly filled. | 
+| `@D_( dims_params )` | Space for items is allocated individually only at items insertion. Used like **sparse** arrays, when the array is most likely be empty. | 
 
-Dimensions lengths are pass as annotation parameters and  separated with `|`  
+Required field dimensions lengths `dims_params` are pass as annotation parameters, digits separated with `|` or `/`
 `Variable dimensions` are denoted with the negative number, which value is the maximum dimension length 
 
 ```java
 class Server implements InCS, InCPP, InC {
 	interface ToMyClients {
 		class Pack {
-			@D_(1 | 2 | 7) short dim_field;// optional field of shorts with 1 x 2 x 7 dimensions 
-			@D(2 | -7) int var_dim_field;//the last dimension has variable, up to 7 length 
+			@D(1 | 2 | 3) short dim_field;      // required multidimensional field of int16_t and fixed 1 x 2 x 3 dimensions 
+			@I_() @D(1 | 2 | 3) short dim_field;// optional multidimensional field of int16_t and fixed 1 x 2 x 3 dimensions @I_()- is a special form annotation
+
+			@I_ @D(1 | 2 | 3) short dim_field;  // optional multidimensional field of uint16_t and fixed 1 x 2 x 3 dimensions 
+
+			@A @D(1 | 2 | 3) short dim_field;   // required multidimensional field of uint16_t and fixed 1 x 2 x 3 dimensions 
+			@A_ @D(1 | 2 | 3) short dim_field;  // optional multidimensional field of uint16_t and fixed 1 x 2 x 3 dimensions
+
+			@D(1 | -2 | 3) int dim_field;       // optional multidimensional field of int32_t, and fixed first dimension 1  and variable others with max lengths 2 and 3 
+
+			@I @D_(1 | -2 | 7) int dim_field;  // optional multidimensional field of uint32_t and variable second dimension 
 		}
 	}
 }
@@ -463,24 +472,23 @@ class Server implements InCS, InCPP, InC {
 
 Packet field can array-item: a plain array of primitives. This denoted with array-item `@__( length )` annotation.  
 If the annotation parameter `length` is:
--  45 : single number, this is `required` field with fixed, equal provided value, array length.
-- -78 : with `-` mark. this is `optional` field with dynamic array length. The value is the maximum of variable array length, and should be provided at field initialization.
-    If the field is multidimensional, all items have the same length
-- ~32 : with `~` mark. this is the `optional` multidimensional field where each item has an individual, dynamic array length. The value is the item's, maximum array length. 
-                  It should be provided at every multidimensional field's item insertion.
+-  45 : single number, this is field with fixed item-array length, equal provided value.
+- -78 : with `-` mark. this is always `optional` field with variable length item-array. The value is the item-array max length and should be provided at field initialization  
+                 If the field is multidimensional, all items will have the same length
+- ~32 : with `~` mark. this is always `optional` multidimensional field where each item-array has an individual, variable length. 
+        The value is the item-array maximum length and should be provided at each item insertion.
 
-### Using example
 
 ```java
 class Server implements InCS, InCPP, InC {
 	interface ToMyClients {
 		class Pack {
-			@D(2 | 3) @__(3)      int field1; // Multidimensional field with predefined dimensions 2 x 3  
-			// Returns  array-items of predefined length of 3 ints.
-			@D(-3 | 2 | 1) @__(-3) int field2;  // A multidimensional field with dimensions (up to 3) x 2 x 1   
-			// Returns array-items with same up to 3, length
-			@D(1 | 4) @__(~3)     int field3; // Multidimensional field with predefined dimensions 1 x 4
-			// Returns array-items with individual variable up to 3, length 
+			@__(3)      int field1; // required field of item-array with fixed length of 3 int-s 
+			@I_()  @__(3)      int field1; // optional field with item-array fixed length of 3 int-s 
+			
+            @D(2 | 3) @__(3)      int field1; //required multidimensional field with predefined dimensions 2 x 3 of item-array with fixed length of 3 int-s   
+			@D(-3 | 2 | 1) @__(-3) int field2;  // optional multidimensional field with dimensions (up to 3) x 2 x 1 of array-items with all the same, up to 3, length
+			@D(1 | 4) @__(~3)     int field3; // optional multidimensional field with predefined dimensions 1 x 4 array-items with an individual, variable, up to 3, length 
 		}
 	}
 }
