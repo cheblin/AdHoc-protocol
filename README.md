@@ -459,13 +459,15 @@ class Server implements InCS, InCPP, InC {
 }
 ```
 
-# Fields with array-items
+# Array fields
 
-Packet field can store array-item: a plain array of primitives. This denoted with array-item `@__( length )` annotation.  
+Packet field can array-item: a plain array of primitives. This denoted with array-item `@__( length )` annotation.  
 If the annotation parameter `length` is:
--  45 - positive number, this number is the length of the array of the item.
-- -78 - negative. The number is the maximum array variable length. All field array-items have the same length. The exact length is determined at field initialization.
-- ~32 - with ~ . The number is the maximum array variable length. Each field array-item have individual variable length, fit to inserted data
+-  45 : single number, this is `required` field with fixed, equal provided value, array length.
+- -78 : with `-` mark. this is `optional` field with dynamic array length. The value is the maximum of variable array length, and should be provided at field initialization.
+    If the field is multidimensional, all items have the same length
+- ~32 : with `~` mark. this is the `optional` multidimensional field where each item has an individual, dynamic array length. The value is the item's, maximum array length. 
+                  It should be provided at every multidimensional field's item insertion.
 
 ### Using example
 
@@ -595,7 +597,7 @@ class Server implements InCS, InCPP, InC {
 In some cases is critical to transmitting as little bytes as possible. `@B( bits )` annotation denote how many bits will field allocate.
 With `@B( from / to )` form let you set acceptable numbers range and code generator estimate bits amount.  
 
-# Nested packets
+# Field with Other packet datatype
 
 As enums can be any field's data type, a packet can be, field's data type to. Packets enclosing can be as deep as it needed. Cycle enclosing is prohibited.
 
