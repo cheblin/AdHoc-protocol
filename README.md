@@ -484,6 +484,7 @@ class Server implements InCS, InCPP, InC {
 	interface ToMyClients {
 		class Pack {
 			@__(3)      int field1; // required field of item-array with fixed length of 3 int-s 
+			@__(-69)      byte field1; // optional field of item-array with variable, up to 69 bytes, length 
 			@I_()  @__(3)      int field1; // optional field with item-array fixed length of 3 int-s 
 			
             @D(2 | 3) @__(3)      int field1; //required multidimensional field with predefined dimensions 2 x 3 of item-array with fixed length of 3 int-s   
@@ -600,7 +601,7 @@ class Server implements InCS, InCPP, InC {
 In some cases is critical to transmitting as little bytes as possible. `@B( bits )` annotation denote how many bits will field allocate.
 With `@B( from / to )` form let you set acceptable numbers range and code generator estimate bits amount.  
 
-# Field with Other packet datatype
+# Field with Other packet as datatype
 
 As enums can be any field's data type, a packet can be, field's data type to. Packets enclosing can be as deep as it needed. Cycle enclosing is prohibited.
 
