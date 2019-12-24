@@ -496,7 +496,7 @@ class Server implements InCS, InCPP, InC {
 
 # String fields
 
-Strings in **AdHoc protocol** on all languages are encoded in UTF-8 byte array. By default, without annotation, a string has at most 256 bytes. **NOT CHARS OR SYMBOLS**   
+Strings in **AdHoc protocol** on all languages are encoded in UTF-8 byte array. By default, without annotation, a string has at most 256 bytes: **NOT CHARS OR SYMBOLS!!**   
 String length can be changed with array `@__( new_length_in_bytes )` annotation.
 All string fields are `optional`
 
