@@ -554,12 +554,10 @@ Annotation `@I_` **without parameters**, make field with:
  * integer datatype - unsigned and `optional`,   
  * with a `float` or `double` datatype - `optional`  
  
-Special form `@I_()` annotation, make field with primitive type - `optional`.
-________________________
+Special form `@I_()` annotation, make field with primitive type - `optional`.  
 
-`@I` and `@I_` annotations parameters let to provide additional metainformation about numbers field will store.
-
-If some field value changes in, for example, range from `200 005` to `200 078`, it could be better, internally, to allocate, to store it, just one-byte, and `200 005` constant as offsets.
+`@I` and `@I_` annotations parameters let to provide additional metainformation about numbers field will store.  
+If some field value changes in, for example, range from `200 005` to `200 078`, it could be better, internally, to allocate, to store value, just one-byte, and `200 005` constant as offsets.
 And generate external, getter/setter functions, that transform value from external to the internal representation and vice versa. 
 
 This kind of information can be passed in different forms.
