@@ -19,7 +19,7 @@ eliminating the discovered shortcomings.
 **AdHoc** supports:
 - bitfields,
 - standard set primitive datatypes and more 
-- UTF8 strings using everywhere
+- UTF8 strings everywhere
 - `optional` and `requiered` fields
 - multidimensional fields with predefined and variable dimensions
 - nested packs, enums
@@ -60,20 +60,31 @@ Using programming keywords of any programming language that **AdHoc protocol** g
 
 **AdHocAgent** is checking used in protocol specification names before upload to server generator.
 
-In the java file, only **one** top-level class can be `public` and it name should be the same as file name. 
-In **AdHoc protocol** treat this name as the protocol project name.
+# Project file
 
-# Network topology
-
-Most, similar **AdHoc protocol**, solutions are a concern only on information that nodes exchange.  
-**AdHoc protocol** specification provides facilities to describe full network topology: nodes, channels, packs and there relationships.
-
-**None public** file top-level `class` denoted the host/node/device/unit that participate in information exchange. 
- 
+In the java source file, the root `public` class should have the same name as the file. **AdHoc protocol**  use this name as the protocol project name.
+This file should be stored in a folder structure with layout based on `package` instruction.
 ```java
 package org.company.some_namespace;// You project namespace. Required!
 
-import org.unirail.AdHoc.*;//        importing AdHoc protocol annotations 
+import org.unirail.AdHoc.*;//        importing AdHoc protocol annotations. Required!
+
+public class MyProject { // this class ( and file ) name, is the AdHoc protocol description project name
+	
+} 
+```
+
+# Network topology
+
+Most, similar **AdHoc protocol**, solutions are a concern only on serialization of the information.  
+In turn **AdHoc protocol** provides facilities to describe full network topology: nodes, channels, packs, and their relations
+
+`public class` declared inside project class denoted the host(node/device/unit) that participate in information exchange. 
+ 
+```java
+package org.company.some_namespace;
+
+import org.unirail.AdHoc.*; 
 
 public class MyDemoProject {//this class ( and file ) name, is the AdHoc protocol description project name
 	
@@ -90,7 +101,7 @@ The `implements` java keyword on host, denotes the list of the desired target pr
 
 Each host can enclose _several_ communication interfaces through which it exchanges information with others.  
 Communication interfaces are expressed with java `interface` keyword.
-An interface has to be connected with others by Channels entity. Otherwise, it ignored.
+An interface has to be connected with others by `Channels` entity. Otherwise, it ignored.
 
 Every communication interface can contain multiple packs, that the host can **RECEIVE** and handle through this interface.   
 Packets declarations can be nested in each other.   
@@ -473,8 +484,10 @@ class Server implements InCS, InCPP, InC {
 Packet field can array-item: a plain array of primitives. This denoted with array-item `@__( length )` annotation.  
 If the annotation parameter `length` is:
 -  45 : single number, this is field with fixed item-array length, equal provided value.
-- -78 : with `-` mark. this is always `optional` field with variable length item-array. The value is the item-array max length and should be provided at field initialization  
+- +78 : with `+` mark. this is an `optional` field with fixed length item-array.   
                  If the field is multidimensional, all items will have the same length
+- -78 : with `-` mark. this is an `optional` field with variable length item-array. The value is the item-array max length and should be provided at field initialization  
+                 If the field is multidimensional, all items will have the same length                 
 - ~32 : with `~` mark. this is always `optional` multidimensional field where each item-array has an individual, variable length. 
         The value is the item-array maximum length and should be provided at each item insertion.
 
