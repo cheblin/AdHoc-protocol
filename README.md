@@ -86,13 +86,13 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*; 
 
-public class MyDemoProject {//this class ( and file ) name, is the AdHoc protocol description project name
+public class MyDemoProject {
 	
-	public static class Server implements InCS, InCPP, InC { //this host/node code will be generated in C#, C++ and C
+	public static class Server implements InCS, InCPP, InC { //this host(node) source code will be generated in C#, C++ and C
 		
 	}
 	
-	public static class Client implements InKT, InTS, InRUST {
+	public static class Client implements InKT, InTS, InRUST { //this host(node) source code will be generated in Kotlin, Typescript and Rust
 		
 	}
 } 
@@ -100,26 +100,28 @@ public class MyDemoProject {//this class ( and file ) name, is the AdHoc protoco
 The `implements` java keyword on host, denotes the list of the desired target programming languages for the particular host.
 
 Each host can enclose _several_ communication interfaces through which it exchanges information with others.  
-Communication interfaces are expressed with java `interface` keyword.
+Communication interfaces are expressed with java public `interface` keyword.
 An interface has to be connected with others by `Channels` entity. Otherwise, it ignored.
 
 Every communication interface can contain multiple packs, that the host can **RECEIVE** and handle through this interface.   
 Packets declarations can be nested in each other.   
-Packs are, minimal transmitted information unit, and denoted with `class` java construction inside the interface or host.
+Packs are, minimal transmitted information unit, and denoted with public `class` java construction inside the interface or host.
 Packets declared in the host body, outside of any interfaces, if they are not referenced by other packets situated inside an interface, are ignored. 
 > **Packet's names should be unique! This rule is checked by AdHocAgent utility before upload description**  
 
 Every packet should have project scope unique `id` annotation. 
-Located in project file packs without `id` annotation, can acquire the `id` automatically from the server on description processing. 
-But all packs in imported protocol descriptions should have predefined whole project scope unique `id`.
+Packs, in project root file, without `id` annotation, will acquire the `id` automatically from the server, on description processing. 
+But all packs in imported, protocol descriptions, should be with predefined, project scope unique `id`.
 
  
-Pack `class` fields are a list of exact information it contains. 
+Pack `class` fields - are a list of exact information it contains. 
 
 ```java
 package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
+import com.company.SomeProject; // importing entity from other SomeProject - protocol description file 
+import net.company.SomeOtherProject; // importing entity from other SomeOtherProject - protocol description file 
 
 public class MyDemoProject {
 	public static class Server implements InCS, InCPP, InC {
