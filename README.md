@@ -125,10 +125,12 @@ import net.company.SomeOtherProject; // importing entity from other SomeOtherPro
 
 public class MyDemoProject {
 	public static class Server implements InCS, InCPP, InC {
-		public interface ToMyClients {
+
+		public interface ToMyClients { //communication interface ToMyClients
+
 			class Login { //    host Server can receive Login packs through ToMyClients interface
-				@__(20) String login;// max 20 bytes array for UTF8 encoded login string
-				@__(12) byte   password;//maximum 12 bytes array for password hash
+				@__(20) String login;// up to 20 bytes array for UTF8 encoded login string
+				@__(-12) byte   password;//up to 12 bytes array for password hash
 			}
 		}
 	}
@@ -148,8 +150,8 @@ public class MyDemoProject {
 	}
 }
 ```
-Here, the `Server` host declare, it can **receive** `Login` packet on it's `ToMyClients` interface. 
-Every counterpart connected to this interface will get code to create, populate with data, and send the `Login` packet to `Server`.
+In above example, the `Server` host declare, it can **receive** `Login` packet on it's `ToMyClients` interface. 
+Every counterpart connected to this interface by `channel` will get code to create, populate with data, and send the `Login` packet to `Server`.
 And the `Client` host declares the capability to receive `Position` packet on its `ToServer` interface.
 
 Packet `class`, internal `static`, `final` fields, **with primitive datatype** (`int_constant`, `byte_constant` ), AdHoc generator treat as `Position` packet constants.
@@ -280,57 +282,58 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {}
+public class MyDemoProject {
 
-class Server implements InCS, InCPP, InC {
-	interface ToMyClients extends CommonPacks { // node interface
-	@id(0)
-	class FirstPack {}
-	}
-	
-	interface IWoker {
-	@id(1)
-	class Job implements ToMyClients {}  // Job Packet
-	}
-	
-	interface ILogger {// Server communication interface
-		
-	@id(2)
-	class Log {}
-	}
-	
-	interface IDispatcher {
-	@id(3)
-	class Dispatch {}
-	}
-	
-	interface CommonPacks {
-	@id(4)
-	class Pack1 {}
-		
-	@id(5)
-	class Pack2 {}
-		
-	@id(6)
-	class Pack3 {}
-	}
+    class Server implements InCS, InCPP, InC {
+        interface ToMyClients extends CommonPacks { // node interface
+        @id(0)
+        class FirstPack {}
+        }
+        
+        interface IWoker {
+        @id(1)
+        class Job implements ToMyClients {}  // Job Packet
+        }
+        
+        interface ILogger {// Server communication interface
+            
+        @id(2)
+        class Log {}
+        }
+        
+        interface IDispatcher {
+        @id(3)
+        class Dispatch {}
+        }
+        
+        interface CommonPacks {
+        @id(4)
+        class Pack1 {}
+            
+        @id(5)
+        class Pack2 {}
+            
+        @id(6)
+        class Pack3 {}
+        }
+    }
+    
+    class Client implements InKT, InTS, InRUST {
+        interface ToServer extends Server.CommonPacks { // Client communication interface
+            
+        @id(7)
+        class ServerParams {}
+        }
+    }
+    
+    class ClientServerLink extends AdvProtocol //channel type
+            implements
+            Client.ToServer, // connected interfaces
+                    Server.ToMyClients {}
 }
-
-class Client implements InKT, InTS, InRUST {
-	interface ToServer extends Server.CommonPacks { // Client communication interface
-		
-	@id(7)
-	class ServerParams {}
-	}
-}
-
-class ClientServerLink extends AdvProtocol //channel type
-		implements
-		Client.ToServer, // connected interfaces
-				Server.ToMyClients {}
 ```
 
- The server assigns `id` annotation with a unique number to every packet that has not. Keep this `Id` if you concern backward compatibility
+Look, the server assigns `id` annotation with a unique number to every packet that has not. Keep this `Id` if you concern backward compatibility
 
 
 # Channels
@@ -343,22 +346,22 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {}
-
-class Server implements InCS, InCPP, InC {
-	interface ToMyClients { // node interface
-		class FirstPack {}
-	}
+public class MyDemoProject {
+    class Server implements InCS, InCPP, InC {
+        interface ToMyClients { // node interface
+            class FirstPack {}
+        }
+    }
+    
+    class Client implements InKT, InTS, InRUST {
+        interface ToServer {} // node interface 
+    }
+    
+    class ClientServerLink extends AdvProtocol //channel type
+            implements
+            Client.ToServer, // connected interfaces
+                    Server.ToMyClients {}
 }
-
-class Client implements InKT, InTS, InRUST {
-	interface ToServer {} // node interface 
-}
-
-class ClientServerLink extends AdvProtocol //channel type
-		implements
-		Client.ToServer, // connected interfaces
-				Server.ToMyClients {}
 ```
 
 To transmit data via the radio channel / raw UART, use `AdvChannel` type entity. 
@@ -375,41 +378,42 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {}
+public class MyDemoProject {
 
-enum LIMITS_STATE {
-	AQ_NAV_STATUS_INIT, //          assignable fields
-	AQ_NAV_STATUS_STANDBY,
-	AQ_NAV_STATUS_MANUAL,
-	AQ_NAV_STATUS_ALTHOLD,
-	AQ_NAV_STATUS_POSHOLD,
-	AQ_NAV_STATUS_GUIDED;
-	
-	final int
-			LIMITS_INIT       = 0, //pre-initialization
-			LIMITS_DISABLED   = 1, //disabled
-			LIMITS_ENABLED    = 2, //checking limits
-			LIMITS_TRIGGERED  = 3, //a limit has been breached
-			LIMITS_RECOVERING = 4, //taking action eg. RTL
-			LIMITS_RECOVERED  = 5;  //we're no longer in breach of a limit
-}
-
-@Flags enum LIMIT_MODULE {
-	;
-	
-	final int
-			LIMIT_GPSLOCK  = 1, //pre-initialization
-			LIMIT_GEOFENCE = 2, //disabled
-			LIMIT_ALTITUDE = 4;  //checking limits
-}
-
-class Client implements InKT, InTS, InRUST {
-	interface ToServer {
-		class Position {
-			LIMIT_MODULE limit_module;
-			LIMITS_STATE limits_state;
-		}
-	}
+    enum LIMITS_STATE {
+        AQ_NAV_STATUS_INIT, //          assignable fields
+        AQ_NAV_STATUS_STANDBY,
+        AQ_NAV_STATUS_MANUAL,
+        AQ_NAV_STATUS_ALTHOLD,
+        AQ_NAV_STATUS_POSHOLD,
+        AQ_NAV_STATUS_GUIDED;
+        
+        final int
+                LIMITS_INIT       = 0, //pre-initialization
+                LIMITS_DISABLED   = 1, //disabled
+                LIMITS_ENABLED    = 2, //checking limits
+                LIMITS_TRIGGERED  = 3, //a limit has been breached
+                LIMITS_RECOVERING = 4, //taking action eg. RTL
+                LIMITS_RECOVERED  = 5;  //we're no longer in breach of a limit
+    }
+    
+    @Flags enum LIMIT_MODULE {
+        ;
+        
+        final int
+                LIMIT_GPSLOCK  = 1, //pre-initialization
+                LIMIT_GEOFENCE = 2, //disabled
+                LIMIT_ALTITUDE = 4;  //checking limits
+    }
+    
+    class Client implements InKT, InTS, InRUST {
+        interface ToServer {
+            class Position {
+                LIMIT_MODULE limit_module;
+                LIMITS_STATE limits_state;
+            }
+        }
+    }
 }
 ```
 
@@ -542,21 +546,24 @@ For this case exists fields with **only** java numeric datatype. Without annotat
 
 ![image](https://user-images.githubusercontent.com/29354319/71319106-a3eb6080-24d4-11ea-9f51-10f60e4e0057.png)
 
-Special form `@I_()` annotation, make this field type - `optional`.
-
 Annotation `@I`, **without parameters**, make field unsigned and `reqiered`. With full assigned integer datatype range.
  
 ![image](https://user-images.githubusercontent.com/29354319/71323707-301b7900-2511-11ea-954c-69aab2a70509.png)
 
 Annotation `@I_` **without parameters**, make field with:
  * integer datatype - unsigned and `optional`,   
- * with a `float` or `double` datatype - `optional`
+ * with a `float` or `double` datatype - `optional`  
+ 
+Special form `@I_()` annotation, make field with primitive type - `optional`.
+________________________
 
-If some value changes in, for example, range from `200 005` to `200 078`, it could be better, internally, to allocate, to store it, just one-byte with `200 005` constant as offsets.
-And provide external, getter/setter functions, that transform value from external to the internal representation and vice versa. 
+`@I` and `@I_` annotations parameters let to provide additional metainformation about numbers field will store.
 
-`@I` and `@I_` annotations can accept these kind parameters in the different forms.
-* a single integer value: it's shifting the middle of the range of field assigned integer datatype
+If some field value changes in, for example, range from `200 005` to `200 078`, it could be better, internally, to allocate, to store it, just one-byte, and `200 005` constant as offsets.
+And generate external, getter/setter functions, that transform value from external to the internal representation and vice versa. 
+
+This kind of information can be passed in different forms.
+* a single integer value: this just shifting the middle of the range of field assigned integer datatype
 ```java
      @I_( 31 ) byte field;       //will generate optional field with acceptable values in the range from -96 to 158 with int16_t as external and uint8_t as internal datatype  
  ```
@@ -625,36 +632,36 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {}
-
-class Server implements InCS, InCPP, InC {
-	interface ToMyClients { // node interface
-		
-		class FirstPack {}
-	}
+public class MyDemoProject {
+    class Server implements InCS, InCPP, InC {
+        interface ToMyClients { // node interface
+            
+            class FirstPack {}
+        }
+    }
+    
+    class Client implements InKT, InTS, InRUST {
+        interface ToServer { // Client communication interface
+            
+            class ServerParams {
+                @D(-5) Geo.Point position; //multidimensional field of Geo.Point items with one dimension up to 5 items
+                String name;
+                @A long id;
+            }
+        }
+        
+        interface Geo {
+            class Point {
+                float x;
+                float y;
+                float z;
+            }
+        }
+    }
+    
+    class ClientServerLink extends AdvProtocol //channel type
+            implements
+            Client.ToServer, // connected interfaces
+                    Server.ToMyClients {}
 }
-
-class Client implements InKT, InTS, InRUST {
-	interface ToServer { // Client communication interface
-		
-		class ServerParams {
-			@D(-5) Geo.Point position; //multidimensional field of Geo.Point items with one dimension up to 5 items
-			String name;
-			@A long id;
-		}
-	}
-	
-	interface Geo {
-		class Point {
-			float x;
-			float y;
-			float z;
-		}
-	}
-}
-
-class ClientServerLink extends AdvProtocol //channel type
-		implements
-		Client.ToServer, // connected interfaces
-				Server.ToMyClients {}
 ```
