@@ -62,14 +62,14 @@ Using programming keywords of any programming language that **AdHoc protocol** g
 
 # Project file
 
-In the java source file, the root `public` class should have the same name as the file. **AdHoc protocol**  use this name as the protocol project name.
+In the java source file, the root `public` `interface` should have the same name as the file. **AdHoc protocol**  use this name as the protocol project name.
 This file should be stored in a folder structure with layout based on `package` instruction.
 ```java
 package org.company.some_namespace;// You project namespace. Required!
 
 import org.unirail.AdHoc.*;//        importing AdHoc protocol annotations. Required!
 
-public class MyProject { // this class ( and file ) name, is the AdHoc protocol description project name
+public interface MyProject { // this interface ( and file ) name, is the AdHoc protocol description project name
 	
 } 
 ```
@@ -79,20 +79,20 @@ public class MyProject { // this class ( and file ) name, is the AdHoc protocol 
 Most, similar **AdHoc protocol**, solutions are a concern only on serialization of the information.  
 In turn **AdHoc protocol** provides facilities to describe full network topology: nodes, channels, packs, and their relations
 
-`public class` declared inside project class denoted the host(node/device/unit) that participate in information exchange. 
+`class` declared inside project class denoted the host(node/device/unit) that participate in information exchange. 
  
 ```java
 package org.company.some_namespace;
 
 import org.unirail.AdHoc.*; 
 
-public class MyDemoProject {
+public interface MyDemoProject {
 	
-	public static class Server implements InCS, InCPP, InC { //this host(node) source code will be generated in C#, C++ and C
+	class Server implements InCS, InCPP, InC { //this host(node) source code will be generated in C#, C++ and C
 		
 	}
 	
-	public static class Client implements InKT, InTS, InRUST { //this host(node) source code will be generated in Kotlin, Typescript and Rust
+	class Client implements InKT, InTS, InRUST { //this host(node) source code will be generated in Kotlin, Typescript and Rust
 		
 	}
 } 
@@ -100,12 +100,12 @@ public class MyDemoProject {
 The `implements` java keyword on host, denotes the list of the desired target programming languages for the particular host.
 
 Each host can enclose _several_ communication interfaces through which it exchanges information with others.  
-Communication interfaces are expressed with java public `interface` keyword.
+Communication interfaces are expressed with java `interface` keyword.
 An interface has to be connected with others by `Channels` entity. Otherwise, it ignored.
 
 Every communication interface can contain multiple packs, that the host can **RECEIVE** and handle through this interface.   
 Packets declarations can be nested in each other.   
-Packs are, minimal transmitted information unit, and denoted with public `class` java construction inside the interface or host.
+Packs are, minimal transmitted information unit, and denoted with `class` java construction inside the interface or host.
 Packets declared in the host body, outside of any interfaces, if they are not referenced by other packets situated inside an interface, are ignored. 
 > **Packet's names should be unique! This rule is checked by AdHocAgent utility before upload description**  
 
@@ -123,8 +123,8 @@ import org.unirail.AdHoc.*;
 import com.company.SomeProject; // importing entity from other SomeProject - protocol description file 
 import net.company.SomeOtherProject; // importing entity from other SomeOtherProject - protocol description file 
 
-public class MyDemoProject {
-	public static class Server implements InCS, InCPP, InC {
+public interface MyDemoProject {
+	class Server implements InCS, InCPP, InC {
 
 		public interface ToMyClients { //communication interface ToMyClients
 
@@ -135,9 +135,9 @@ public class MyDemoProject {
 		}
 	}
 	
-	static class Client implements InKT, InTS, InRUST {
+	class Client implements InKT, InTS, InRUST {
 		public interface ToServer {
-			public class Position { //    host Client can receive Position packs through ToServer interface
+			class Position { //    host Client can receive Position packs through ToServer interface
 				@A long time_usec;//Timestamp (microseconds since system boot or since UNIX epoch)
 				float x;//X Position
 				float y;//Y Position
@@ -162,8 +162,8 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {
-	public static class Server implements InCS, InCPP, InC {
+public interface MyDemoProject {
+	class Server implements InCS, InCPP, InC {
 		interface ToMyClients { // node interface
 			class FirstPack {}
 		}
@@ -189,14 +189,14 @@ public class MyDemoProject {
 		}
 	}
 	
-	public static class Client implements InKT, InTS, InRUST {
+	class Client implements InKT, InTS, InRUST {
 		interface ToServer { // Client communication interface
 			
 			class ServerParams {}
 		}
 	}
 	
-	public static class ClientServerLink extends AdvProtocol //channel type
+	class ClientServerLink extends AdvProtocol //channel type
 			implements
 			Client.ToServer, // connected interfaces
 					Server.ToMyClients {}
@@ -225,9 +225,9 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {
+public interface MyDemoProject {
 	
-	public static class Server implements InCS, InCPP, InC {
+	class Server implements InCS, InCPP, InC {
 		public interface ToMyClients extends CommonPacks { // ToMyClients interface inherit all packs from CommonPacks
 			class FirstPack {}
 		}
@@ -254,7 +254,7 @@ public class MyDemoProject {
 		}
 	}
 	
-	public static class Client implements InKT, InTS, InRUST {
+	class Client implements InKT, InTS, InRUST {
 		interface ToServer extends Server.CommonPacks { // getting all packs from Server.CommonPacks
 			class ServerParams {}
 			
@@ -262,7 +262,7 @@ public class MyDemoProject {
 		}
 	}
 	
-	public static class ClientServerLink extends AdvProtocol //channel type
+	class ClientServerLink extends AdvProtocol //channel type
 			implements
 			Client.ToServer, // connected interfaces
 					Server.ToMyClients {}
@@ -282,7 +282,7 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {
+public interface MyDemoProject {
 
     class Server implements InCS, InCPP, InC {
         interface ToMyClients extends CommonPacks { // node interface
@@ -346,7 +346,7 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {
+public interface MyDemoProject {
     class Server implements InCS, InCPP, InC {
         interface ToMyClients { // node interface
             class FirstPack {}
@@ -378,7 +378,7 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {
+public interface MyDemoProject {
 
     enum LIMITS_STATE {
         AQ_NAV_STATUS_INIT, //          assignable fields
@@ -630,7 +630,7 @@ package org.company.some_namespace;
 
 import org.unirail.AdHoc.*;
 
-public class MyDemoProject {
+public interface MyDemoProject {
     class Server implements InCS, InCPP, InC {
         interface ToMyClients { // node interface
             
