@@ -423,6 +423,13 @@ Not initialized enum fields are automatically assigned integer values. If enum h
 If you need more control on enum fields type (*only integer types are supported) and values, use `enum` `static` `final` fields.  
 
 > **Please pay attention:**  enum body cannot be empty, should have at least `;` (semicolon), if you declare only `static` `final` fields. 
+#Constant field
+Packet `class`, internal `static`, `final` fields,  AdHoc generator treat as packet constants. 
+Primitive datatype constants fields value can be assigned directly with a number or as a result of some math expression. All wide java math functions are available.
+Constant fields also can be used as fields annotation parameter. In java, this field value should be the result of [compile-time constant expression](https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.28) only.     
+But AdHoc protocol relax this restriction by means of passing constants. The constant that declared after the comma, on the same line and that assigned `0`.
+This constant in AdHoc protocol will get value from first declared constant.
+**Private** constants values are used but in generated code never declared. 
 
 # Importing descriptions
 Java `import` statement at the beginning of the file before any type definitions but after the package statement, let use interfaces and packages definitions from 
