@@ -92,7 +92,7 @@ public interface MyDemoProject {
 		
 	}
 	
-	class Client implements InKT, InTS, InRUST { //this host(node) source code will be generated in Kotlin, Typescript and Rust
+	class Client implements InKT, InTS, InRS { //this host(node) source code will be generated in Kotlin, Typescript and Rust
 		
 	}
 } 
@@ -135,7 +135,7 @@ public interface MyDemoProject {
 		}
 	}
 	
-	class Client implements InKT, InTS, InRUST {
+	class Client implements InKT, InTS, InRS {
 		public interface ToServer {
 			class Position { //    host Client can receive Position packs through ToServer interface
 				@A long time_usec;//Timestamp (microseconds since system boot or since UNIX epoch)
@@ -189,7 +189,7 @@ public interface MyDemoProject {
 		}
 	}
 	
-	class Client implements InKT, InTS, InRUST {
+	class Client implements InKT, InTS, InRS {
 		interface ToServer { // Client communication interface
 			
 			class ServerParams {}
@@ -254,7 +254,7 @@ public interface MyDemoProject {
 		}
 	}
 	
-	class Client implements InKT, InTS, InRUST {
+	class Client implements InKT, InTS, InRS {
 		interface ToServer extends Server.CommonPacks { // getting all packs from Server.CommonPacks
 			class ServerParams {}
 			
@@ -318,7 +318,7 @@ public interface MyDemoProject {
         }
     }
     
-    class Client implements InKT, InTS, InRUST {
+    class Client implements InKT, InTS, InRS {
         interface ToServer extends Server.CommonPacks { // Client communication interface
             
         @id(7)
@@ -353,7 +353,7 @@ public interface MyDemoProject {
         }
     }
     
-    class Client implements InKT, InTS, InRUST {
+    class Client implements InKT, InTS, InRS {
         interface ToServer {} // node interface 
     }
     
@@ -406,7 +406,7 @@ public interface MyDemoProject {
                 LIMIT_ALTITUDE = 4;  //checking limits
     }
     
-    class Client implements InKT, InTS, InRUST {
+    class Client implements InKT, InTS, InRS {
         interface ToServer {
             class Position {
                 LIMIT_MODULE limit_module;
@@ -419,8 +419,10 @@ public interface MyDemoProject {
 
 `@Flags` annotations denote special **Flag Bits enum**.
 
-Not initialized enum fields are automatically assigned integer values. If enum has `@Flags` annotation, generated value, respectively, is **bit flags** like.
-If you need more control on enum fields type (*only integer types are supported) and values, use `enum` `static` `final` fields.  
+None-initialized enum fields are automatically assigned integer values. If enum has `@Flags` annotation, generated value, respectively, is **bit flags** like.
+If you need more control on enum fields type (*only integer types are supported) and values, use `enum` `static` `final` fields. 
+
+Enum declaration is embedded in a host, if host's packs use it or if enum has the `public` modifier. Public enums are spread among all hosts. 
 
 > **Please pay attention:**  enum body cannot be empty, should have at least `;` (semicolon), if you declare only `static` `final` fields. 
 #Constant field
@@ -645,7 +647,7 @@ public interface MyDemoProject {
         }
     }
     
-    class Client implements InKT, InTS, InRUST {
+    class Client implements InKT, InTS, InRS {
         interface ToServer { // Client communication interface
             
             class ServerParams {
