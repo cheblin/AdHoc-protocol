@@ -13,9 +13,9 @@ Some examples of solutions built in this way:
 Having studied these, and many other solutions, I have decided to ~~build my own Theme Park with...~~ create **AdHoc protocol**: the system that will implement and complement the merits, 
 eliminating the discovered shortcomings.
 
-**AdHoc** protocol is a multilingual **C, C++, Rust, C#, Kotlin, Typescript...Scala/GO(upcoming)**, low-level binary protocol boilerplate code generator.
- According to your protocol description file, **AdHoc** server generates source code, so you just have to insert your received packs handlers, and logic of creating a 
- new package, populating, with data and sending it to receiver.   
+The **AdHoc** protocol is a multilingual **C, C++, Rust, C#, Kotlin, Typescript...Scala/GO(upcoming)**, low-level binary protocol boilerplate code generator.
+ According to your protocol description file, the **AdHoc** server generates source code, so you just have to insert your received pack handlers, and the logic of creating a 
+ new package, populating, with data and sending it to the receiver.   
 **AdHoc** supports:
 - bitfields,
 - standard set primitive datatypes and more 
@@ -33,24 +33,24 @@ eliminating the discovered shortcomings.
 - embedded code adapter to simplify fast exchange data between user data objects and **AdHoc** protocol packs 
 - [Base 128 Varint](https://developers.google.com/protocol-buffers/docs/encoding) compression.
 
-At the moment, the code generator AdHoc is built like **SaaS**. To get the generated (and tested) code, it is necessary:
+At the moment, the code generator AdHoc is built as [**SaaS**](https://en.wikipedia.org/wiki/Software_as_a_service). To get the generated (and tested) code, it is necessary:
 
 -   install **[JDK 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)** please
     ensure that `javac` (java compiler) is in PATH and accessible from the console.
 -   install any **JAVA** IDE (**[Intellij IDEA](https://www.jetbrains.com/idea/download/)** – just fine)
--   download [AdHoс protocol annotations](https://github.com/cheblin/AdHoc-protocol/tree/master/org/unirail/AdHoc).
+-   use built-in [AdHocAgent binary jar](https://github.com/cheblin/AdHocAgent/tree/master/bin) 
+    or  download [AdHoс protocol annotations](https://github.com/cheblin/AdHoc-protocol/tree/master/org/unirail/AdHoc).
     **AdHoc protocol** description projects will need a reference to these
     annotations, precisely to the folder where the `org` - the annotations root
     folder is located. Since annotations are referenced as sources, in **IDEA**, you
-    have to add them to the project in this way [Add Content
-    Root](https://www.jetbrains.com/help/idea/content-roots.html).
+    have to add them to the project in this way [add Content Root](https://www.jetbrains.com/help/idea/content-roots.html).
 -   To send completed protocol description file to the server (to generate of
     **AdHoc protoco**l handler source code) and receive the result, you will need the
     **[AdHocAgent](https://github.com/cheblin/AdHocAgent)** utility. Please download
     the [precompiled jar](https://github.com/cheblin/AdHocAgent/tree/master/bin)
     or compile the utility from provided source by yourself.
 
-As `DSL` **AdHoc protocol** use java language constructions, in fact protocol description file, is a plain java file. 
+As [`DSL`](https://en.wikipedia.org/wiki/Domain-specific_language) **AdHoc protocol** use java language constructions, in fact protocol description file, is a plain java file. 
 So just create **JAVA** project in your favorite IDE and add reference to [AdHoc protocol annotations](https://github.com/cheblin/AdHoc-protocol/tree/master/src/org/unirail/AdHoc)  
 Then, create java file in your company namespace and import annotations with **import org.unirail.AdHoc.\*;**. 
 
